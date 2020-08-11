@@ -2,9 +2,7 @@
 A virtual chess game made for local multiplayer.
 
 ### Github Page
-
-
-<br>
+https://jinkang-0.github.io/Chess/
 
 ### Features
 - Checkmate detection
