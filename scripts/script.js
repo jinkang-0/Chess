@@ -36,7 +36,7 @@ function checkMove(id, show) {
   } else if (classes.contains("fa-chess-queen")) {
     posQueen(id, moves, !show);
   } else if (classes.contains("fa-chess-king")) {
-    moves = posKing(id, moves, show);
+    moves = posKing(id, moves);
   }
 
   if (show) {

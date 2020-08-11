@@ -100,11 +100,9 @@ function posQueen(id, moves, force) {
 
 }
 
-function posKing(id, moves, check) {
+function posKing(id, moves, posThreat) {
   
   let side = document.getElementById(id).firstChild.classList[2];
-  let col = id.slice(0, 1);
-  let row = id.slice(1, 2);
 
   // get king's moves
   checkPos(id, side, 1, 0, moves);
@@ -116,18 +114,16 @@ function posKing(id, moves, check) {
   checkPos(id, side, -1, 1, moves);
   checkPos(id, side, -1, -1, moves);
 
-  if (check) {
-
-    let posThreat = checkThreat(side);
+  if (posThreat) {
 
     // remove dangerous moves
     moves = moves.filter(function(val) {
       return posThreat.indexOf(val) == -1;
     });
 
-    if (moves.length == 0 && inCheck == side) {
-      checkmate(side);
-    }
+    // if (moves.length == 0 && inCheck == side) {
+    //   checkmate(side);
+    // }
 
   }
 
@@ -156,11 +152,16 @@ function checkThreat(side) {
     if (posThreat[x].firstChild && posThreat[x].firstChild.classList.contains("fa-chess-king") && posThreat[x].firstChild.classList.contains(side)) {
       
       inCheck = side;
+      let moves = [];
 
       // mark King as threatened
       posThreat[x].classList.add("threatened");
+      posKing(posThreat[x].id, moves, posThreat);
 
-      return posThreat[x];
+      // if there is no escape, return undefined
+      if (moves.length == 0) {
+        return undefined;
+      }
 
     }
   }
@@ -237,7 +238,7 @@ function moveTo(id) {
     // if king is in check and there is no escape, checkmate
     let posThreat = checkThreat(turn);
 
-    if ( posThreat.length == undefined) {
+    if ( posThreat == undefined ) {
       inCheck = "end";
       checkmate(turn, posThreat);
     }
