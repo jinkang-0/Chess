@@ -158,7 +158,7 @@ function showMoves(id, moves) {
 
 function hideMoves() {
   
-  selected = "";
+  if (turn.slice(0,1) != "p") selected = "";
 
   let pos = document.getElementsByClassName("pos");
   let len = pos.length;
