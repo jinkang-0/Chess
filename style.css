@@ -159,6 +159,7 @@ i {
   width: 100%;
   height: 7vw;
   background-color: var(--sidebar);
+  margin-bottom: 30px;
 }
 
 #promote i {
@@ -241,7 +242,6 @@ i {
   }
 
   #promote {
-    margin-bottom: 30px;
     height: 5rem;
   }
 

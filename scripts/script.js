@@ -90,6 +90,12 @@ function promote(type) {
   selected = "";
   turn = turn.slice(7);
 
+  if (turn == "white") {
+    turn = "black";
+  } else if (turn == "black") {
+    turn = "white";
+  }
+
   document.getElementById("turn").innerHTML = `${turn.slice(0,1).toUpperCase()}${turn.slice(1)}'s Turn`;
 
 }
