@@ -11,7 +11,6 @@ https://jinkang-0.github.io/Chess/
 - Restart
 <br>
 
-### Features Yet to be Added
-- Castling
-- En passant
-- Online multiplayer
+### Known Bugs
+- I'm aware that the checkmate function does not check to resolve the checkmate if the attacker can be countered, this issue will be on hold until I have time.
+- There may be some weird quirks with mobile devices as this project is made to be accesed on widescreen computers.
