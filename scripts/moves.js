@@ -121,10 +121,6 @@ function posKing(id, moves, posThreat) {
       return posThreat.indexOf(val) == -1;
     });
 
-    // if (moves.length == 0 && inCheck == side) {
-    //   checkmate(side);
-    // }
-
   }
 
   return moves;
@@ -144,11 +140,11 @@ function checkThreat(side) {
     opponents = document.getElementsByClassName("white");
   }
 
-  for (i = 0; i < opponents.length; i++) {
+  for (var i = 0; i < opponents.length; i++) {
     posThreat = Array.prototype.concat.apply( posThreat, checkMove( opponents[i].parentElement.id, false ) );
   }
 
-  for (x = 0; x < posThreat.length; x++) {
+  for (var x = 0; x < posThreat.length; x++) {
     if (posThreat[x].firstChild && posThreat[x].firstChild.classList.contains("fa-chess-king") && posThreat[x].firstChild.classList.contains(side)) {
       
       inCheck = side;
@@ -156,13 +152,14 @@ function checkThreat(side) {
 
       // mark King as threatened
       posThreat[x].classList.add("threatened");
+
+      // check for escape routes
       posKing(posThreat[x].id, moves, posThreat);
 
-      // if there is no escape, return undefined
+      // if there is no escape, return undefined to checkmate
       if (moves.length == 0) {
         return undefined;
       }
-
     }
   }
 

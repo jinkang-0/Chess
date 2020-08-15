@@ -186,7 +186,6 @@ i {
 
 #actions {
   width: 80%;
-  max-height: 60%;
   height: 60%;
   margin-bottom: 20px;
   padding: 3px;
@@ -219,6 +218,7 @@ i {
   
   font-size: 20px;
   transition: 100ms;
+  margin-bottom: 20px;
 
   cursor: pointer;
   outline: none;
@@ -245,14 +245,13 @@ i {
     height: 5rem;
   }
 
-  .sidebar {
-    max-height: 80%;
-  }
-
   #actions {
     width: 40%;
-    min-height: 50%;
-    max-height: 100%;
+    height: 300px;
+  }
+
+  .sidebar {
+    height: 100%;
   }
 
   .restraint {

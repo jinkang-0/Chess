@@ -187,8 +187,6 @@ function getOpp(side) {
     return "white";
   } else if (side == "white") {
     return "black";
-  } else {
-    return null;
   }
 
 }

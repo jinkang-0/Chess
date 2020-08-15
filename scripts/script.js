@@ -104,7 +104,6 @@ function promote(type) {
 function checkmate(side, position) {
 
   document.getElementById("turn").innerHTML = `Checkmate!<br>${side.slice(0,1).toUpperCase()}${side.slice(1)} Won!`;
-  position.classList.remove("threatened");
 
   if (side == "black") {
     blackScore++;
@@ -123,6 +122,9 @@ function restart() {
   selected = "";
   inCheck = "";
   turn = "white";
+
+  // remove threatened marker
+  document.querySelector(".threatened").classList.remove("threatened");
 
   // set turn message
   document.getElementById("turn").innerHTML = `${turn.slice(0,1).toUpperCase()}${turn.slice(1)}'s Turn`;
