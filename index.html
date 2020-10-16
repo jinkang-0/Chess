@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="shortcut icon" href="assets/pawn.png" type="image/x-icon">
+  <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
   <title>Chess</title>
   
   <!-- stylesheets -->
@@ -12,174 +12,158 @@
 
   <!-- scripts -->
   <script src="https://kit.fontawesome.com/bf5b084248.js" crossorigin="anonymous"></script>
-  <script src="scripts/moves.js"></script>
-  <script src="scripts/script.js"></script>
+  <script src="scripts/piece.js"></script>
+  <script src="scripts/board.js"></script>
   <script src="scripts/tools.js"></script>
+  <script src="scripts/moves.js"></script>
 
 </head>
 <body>
 
   <div class="container">
 
-    <!-- main screen -->
-    <div class="main" onclick="outOfBoard()">
+    <!-- top labels -->
+    <div></div>
+    <p class="label">A</p>
+    <p class="label">B</p>
+    <p class="label">C</p>
+    <p class="label">D</p>
+    <p class="label">E</p>
+    <p class="label">F</p>
+    <p class="label">G</p>
+    <p class="label">H</p>
 
-      <div class="restraint">
+    <!-- side labels -->
 
-        <div class="scores">
-          <!-- white's score -->
-          <div>
-            <span>White: </span>
-            <span id="white-score">0</span>
-          </div>
-          
-          <!-- black's score -->
-          <div>
-            <span>Black: </span>
-            <span id="black-score">0</span>
-          </div>
-          
-        </div>
-  
-        <!-- chess board -->
-        <div class="labels">
+    <p class="label">8</p>
+    <p class="label">7</p>
+    <p class="label">6</p>
+    <p class="label">5</p>
+    <p class="label">4</p>
+    <p class="label">3</p>
+    <p class="label">2</p>
+    <p class="label">1</p>
 
-          <br>
+    <div class="board">
 
-          <span class="top-label">A</span>
-          <span class="top-label">B</span>
-          <span class="top-label">C</span>
-          <span class="top-label">D</span>
-          <span class="top-label">E</span>
-          <span class="top-label">F</span>
-          <span class="top-label">G</span>
-          <span class="top-label">H</span>
+      <!-- row 8 -->
+      <div onclick="checkGrid(this.id)" id="A8" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="B8" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="C8" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="D8" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="E8" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="F8" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="G8" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="H8" class="dark"></div>
 
-          <span class="left-label">8</span>
-          <span class="left-label">7</span>
-          <span class="left-label">6</span>
-          <span class="left-label">5</span>
-          <span class="left-label">4</span>
-          <span class="left-label">3</span>
-          <span class="left-label">2</span>
-          <span class="left-label">1</span>
+      <!-- row 7 -->
+      <div onclick="checkGrid(this.id)" id="A7" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="B7" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="C7" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="D7" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="E7" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="F7" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="G7" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="H7" class="silver"></div>
 
-          <span style="grid-row: 1/10; grid-column: 10;"></span>
+      <!-- row 6 -->
+      <div onclick="checkGrid(this.id)" id="A6" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="B6" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="C6" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="D6" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="E6" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="F6" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="G6" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="H6" class="dark"></div>
 
-          <div class="board">
-            <!-- row 8 -->
-            <div id="A8" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-rook black"></i></div>
-            <div id="B8" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-knight black"></i></div>
-            <div id="C8" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-bishop black"></i></div>
-            <div id="D8" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-queen black"></i></div>
-            <div id="E8" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-king black"></i></div>
-            <div id="F8" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-bishop black"></i></div>
-            <div id="G8" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-knight black"></i></div>
-            <div id="H8" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-rook black"></i></div>
-  
-            <!-- row 7 -->
-            <div id="A7" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="B7" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="C7" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="D7" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="E7" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="F7" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="G7" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn black"></i></div>
-            <div id="H7" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn black"></i></div>
-  
-            <!-- row 6 -->
-            <div id="A6" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="B6" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="C6" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="D6" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="E6" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="F6" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="G6" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="H6" onclick="checkSquare(this.id)" class="dark"></div>
-  
-            <!-- row 5 -->
-            <div id="A5" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="B5" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="C5" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="D5" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="E5" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="F5" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="G5" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="H5" onclick="checkSquare(this.id)" class="light"></div>
-  
-            <!-- row 4 -->
-            <div id="A4" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="B4" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="C4" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="D4" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="E4" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="F4" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="G4" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="H4" onclick="checkSquare(this.id)" class="dark"></div>
-  
-            <!-- row 3 -->
-            <div id="A3" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="B3" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="C3" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="D3" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="E3" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="F3" onclick="checkSquare(this.id)" class="light"></div>
-            <div id="G3" onclick="checkSquare(this.id)" class="dark"></div>
-            <div id="H3" onclick="checkSquare(this.id)" class="light"></div>
-  
-            <!-- row 2 -->
-            <div id="A2" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="B2" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="C2" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="D2" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="E2" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="F2" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="G2" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-pawn white"></i></div>
-            <div id="H2" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-pawn white"></i></div>
-  
-            <!-- row 1 -->
-            <div id="A1" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-rook white"></i></div>
-            <div id="B1" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-knight white"></i></div>
-            <div id="C1" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-bishop white"></i></div>
-            <div id="D1" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-queen white"></i></div>
-            <div id="E1" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-king white"></i></div>
-            <div id="F1" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-bishop white"></i></div>
-            <div id="G1" onclick="checkSquare(this.id)" class="dark"><i class="fas fa-chess-knight white"></i></div>
-            <div id="H1" onclick="checkSquare(this.id)" class="light"><i class="fas fa-chess-rook white"></i></div>
-          </div>
+      <!-- row 5 -->
+      <div onclick="checkGrid(this.id)" id="A5" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="B5" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="C5" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="D5" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="E5" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="F5" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="G5" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="H5" class="silver"></div>
 
-        </div>
+      <!-- row 4 -->
+      <div onclick="checkGrid(this.id)" id="A4" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="B4" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="C4" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="D4" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="E4" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="F4" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="G4" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="H4" class="dark"></div>
 
-        <h1 id="turn">White's Turn</h1>
+      <!-- row 3 -->
+      <div onclick="checkGrid(this.id)" id="A3" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="B3" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="C3" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="D3" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="E3" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="F3" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="G3" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="H3" class="silver"></div>
 
-        <div id="promote" style="display: none;">
-          <i onclick="promote('rook')" class="fas fa-chess-rook"></i>
-          <i onclick="promote('knight')" class="fas fa-chess-knight"></i>
-          <i onclick="promote('bishop')" class="fas fa-chess-bishop"></i>
-          <i onclick="promote('queen')" class="fas fa-chess-queen"></i>
-        </div>
-        
-      </div>
+      <!-- row 2 -->
+      <div onclick="checkGrid(this.id)" id="A2" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="B2" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="C2" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="D2" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="E2" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="F2" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="G2" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="H2" class="dark"></div>
 
-    </div>
-
-    <!-- sidebar -->
-    <div class="sidebar" onclick="hideMoves()">
-
-      <!-- action box -->
-      <h1>Action Log</h1>
-      <div id="actions">
-        
-        <!-- actions here -->
-
-      </div>
-
-      <!-- restart button -->
-      <button id="restart" onclick="restart()">Restart</button>
+      <!-- row 1 -->
+      <div onclick="checkGrid(this.id)" id="A1" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="B1" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="C1" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="D1" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="E1" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="F1" class="silver"></div>
+      <div onclick="checkGrid(this.id)" id="G1" class="dark"></div>
+      <div onclick="checkGrid(this.id)" id="H1" class="silver"></div>
 
     </div>
 
   </div>
+
+  <div class="sidebar">
+
+    <div class="banner">
+      <div>
+        <i class="fas fa-chess-king white"></i>
+        <span id="white-score">0</span>
+      </div>
+      <div>
+        <i class="fas fa-chess-king black"></i>
+        <span id="black-score">0</span>
+      </div>
+    </div>
+
+    <div class="inner-sidebar">
+
+      <div class="toast">
+        <i class="fas fa-chess-pawn black"></i>
+        <svg width="103" height="68" viewBox="0 0 103 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.3446 56.8304C19.3446 56.8304 28.3813 58.0021 32.3094 55.9706C36.2375 53.9391 39.4005 45.0829 39.4005 45.0829L43.3759 46.1214C43.3759 46.1214 39.5158 57.013 34.5018 59.9499C29.4878 62.8867 18.3061 60.8059 18.3061 60.8059L19.3446 56.8304Z" fill="#595959"/>
+          <path d="M38.2075 44.7713C38.2075 44.7713 39.9909 36.3191 34.0457 33.0673C28.8436 30.2219 26.6603 28.8258 18.9212 30.8149C14.1451 32.0424 11.2964 35.6177 10.2221 42.9812C8.91716 51.9259 19.8636 54.8427 19.8636 54.8427L17.9942 61.9985C17.9942 61.9985 8.38513 56.5155 5.15456 51.0001C1.89439 45.4343 5.43028 35.8157 7.33887 32.8852C10.8844 27.4413 14.7807 25.5314 20.479 24.8517C21.6652 24.7103 22.4225 25.1117 22.9417 23.124C23.461 21.1363 23.6687 20.3412 24.2918 17.956C26.5051 15.9861 32.3644 17.9415 33.0378 20.2408C32.4146 22.626 32.4146 22.626 31.8954 24.6137C32.161 26.3242 34.3815 26.9175 35.4996 27.5017C40.2336 29.9751 42.7589 32.3672 44.3639 37.4615C45.3845 40.7008 44.5682 46.433 44.5682 46.433L38.2075 44.7713Z" fill="#BDBDBD"/>
+          <path d="M26.6593 20.2731C26.8887 19.3949 27.7866 18.8689 28.6649 19.0984C29.5431 19.3278 30.0473 20.3089 29.8396 21.1039C29.5281 22.2966 28.6291 22.4864 28.6291 22.4864L27.784 25.7215L26.1938 25.306L27.039 22.071C27.039 22.071 26.3477 21.4657 26.6593 20.2731Z" fill="black"/>
+          <path d="M83.2497 53.9873C83.2497 53.9873 74.2626 54.138 70.6481 51.7546C67.0336 49.3713 64.9528 40.4931 64.9528 40.4931L60.9391 41.0635C60.9391 41.0635 63.469 51.9789 68.0432 55.3524C72.6174 58.726 83.8102 57.9313 83.8102 57.9313L83.2497 53.9873Z" fill="#595959"/>
+          <path d="M66.1569 40.3219C66.1569 40.3219 65.3812 31.9825 71.5788 29.4922C77.0018 27.3132 79.301 26.2041 86.6537 28.9592C91.1913 30.6595 93.5711 34.414 93.7773 41.6272C94.0278 50.3896 82.9694 52.0153 82.9694 52.0153L83.9783 59.1145C83.9783 59.1145 94.0215 54.8706 97.82 49.9047C101.653 44.8934 99.2948 35.24 97.7619 32.2089C94.9143 26.5781 91.3169 24.3154 85.8129 23.0432C84.6672 22.7784 83.8792 23.0833 83.5989 21.1113C83.3187 19.1393 83.2066 18.3505 82.8702 15.9841C80.9284 13.8459 74.964 15.0959 74.0401 17.2391C74.3764 19.6055 74.3764 19.6055 74.6567 21.5775C74.1999 23.1973 71.9565 23.5287 70.7941 23.9706C65.8725 25.8419 63.1238 27.8739 60.9661 32.61C59.5941 35.6215 59.735 41.2346 59.735 41.2346L66.1569 40.3219Z" fill="#BDBDBD"/>
+          <path d="M80.285 17.961C80.1612 17.0898 79.342 16.4856 78.4553 16.6116C77.5686 16.7376 76.9619 17.6286 77.0741 18.4174C77.2422 19.6006 78.101 19.8809 78.101 19.8809L78.5571 23.0904L80.1626 22.8622L79.7065 19.6527C79.7065 19.6527 80.4532 19.1442 80.285 17.961Z" fill="black"/>
+          <path d="M26.5273 17.5C26.5273 17.5 30.9962 10.4647 35.5273 6.50001C39.5273 3 43.5273 -3.27826e-07 49.5273 0C56.1038 3.59323e-07 63.0273 8.82149e-06 69.0273 3C74.6842 5.82842 80.0273 15 80.0273 15L75.5273 16C75.5273 16 70.1468 8.33088 66.0273 6.50001C61.9079 4.66914 56.2131 4.21615 50.5273 4.49999C45.9746 4.72728 43.5273 5.49998 38.5273 9.49998C34.2909 12.8892 31.0273 18.5 31.0273 18.5L26.5273 17.5Z" fill="#C4C4C4"/>
+        </svg>
+        <i class="fas fa-chess-knight white"></i>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="scripts/script.js"></script>
 
 </body>
 </html>
