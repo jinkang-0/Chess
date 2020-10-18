@@ -8,10 +8,21 @@ function toLetter(number) {
   return String.fromCharCode(number + 65);
 }
 
+// check boundaries for column or row
+function outOfBounds(any) {
+  if (typeof any == 'string') {
+    return (toNumber(any) < 0 || toNumber(any) >= 8);
+  } else if (typeof any == 'number') {
+    return (any <= 0 || any > 8);
+  } else {
+    console.log('something went wrong');
+  }
+}
+
 // check if piece can move to destination
 function blocked(col, row) {
   // check boundaries
-  if (toNumber(col) < 0 || toNumber(col) >= 8 || row <= 0 || row > 8) return true;
+  if (outOfBounds(col) || outOfBounds(row)) return true;
 
   // determine if target has a piece
   const dest = board.pieces.find(p => p.col == col && p.row == row);
@@ -21,7 +32,7 @@ function blocked(col, row) {
 // check if piece can capture at destination
 function canCapture(piece, col, row) {
   // check boundaries
-  if (toNumber(col) < 0 || toNumber(col) >= 8 || row <= 0 || row > 8) return false;
+  if (outOfBounds(col) || outOfBounds(row)) return false;
 
   // determine if target is from opposing side
   const dest = board.pieces.find(p => p.col == col && p.row == row);
@@ -35,6 +46,7 @@ function rayCheck(piece, colDir, rowDir) {
   const colInc = colDir;
   const rowInc = rowDir;
   var pos = [];
+  var checkThreats = false;
 
   // check in a line (diagonal or straight)
   for (let i = 0; i < 8; i++) {
@@ -43,12 +55,47 @@ function rayCheck(piece, colDir, rowDir) {
 
     // check for empty space or other pieces
     if ( !blocked(newCol, newRow) ) {
+
+      if (checkThreats) {
+        piece.threats.push({
+          id: `${newCol}${newRow}`,
+          row: newRow,
+          col: newCol,
+          level: 1
+        });
+      } else {
+        pos.push(`${newCol}${newRow}`);
+      }
+
+    } else if ( canCapture(piece, newCol, newRow) && !checkThreats ) {
+
       pos.push(`${newCol}${newRow}`);
-    } else if ( canCapture(piece, newCol, newRow) ) {
-      pos.push(`${newCol}${newRow}`);
-      break;
+      piece.threats.push({
+        id: `${newCol}${newRow}`,
+        row: newRow,
+        col: newCol,
+        level: 0
+      });
+      checkThreats = true;
+
     } else {
-      break;
+      
+      let l = 0;
+
+      if (checkThreats) l = 2;
+
+      if (!outOfBounds(newCol) && !outOfBounds(newRow)) {
+        piece.threats.push({
+          id: `${newCol}${newRow}`,
+          row: newRow,
+          col: newCol,
+          level: l
+        });
+      }
+      
+      if (checkThreats) break;
+      checkThreats = true;
+
     }
 
     // keep moving
@@ -58,4 +105,12 @@ function rayCheck(piece, colDir, rowDir) {
 
   return pos;
 
+}
+
+// remove all highlighted grids
+function removeHighlights() {
+  const marked = document.querySelectorAll('.highlight');
+  for (let mark of marked) {
+    mark.classList.remove('highlight');
+  }
 }

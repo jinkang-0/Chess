@@ -5,6 +5,7 @@
   --board: #1C1C1C;
   --silver: #AC9C9C;
   --dark: #147171;
+  --highlight: #6cd742;
   --toast: #0A9063;
 }
 
@@ -72,6 +73,11 @@ body {
 
 .dark {
   background: var(--dark);
+}
+
+.highlight {
+  background: var(--highlight);
+  border: 1px solid var(--board);
 }
 
 .white {

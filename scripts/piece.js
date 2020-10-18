@@ -6,6 +6,7 @@ class Piece {
     this.type = type;
     this.color = color;
     this.moves = [];
+    this.threats = [];
   }
 
   show() {
@@ -25,15 +26,21 @@ class Piece {
 
   checkMoves() {
 
+    this.threats = [];
+
     switch (this.type) {
       case 'pawn':
         return pawnCheck(this);
       case 'rook':
         return rookCheck(this);
+      case 'knight':
+        return knightCheck(this);
       case 'bishop':
         return bishopCheck(this);
       case 'queen':
         return queenCheck(this);
+      case 'king':
+        return kingCheck(this);
     }
 
   }
@@ -43,16 +50,23 @@ class Piece {
     // remove current grid icon
     const old = document.getElementById(`${this.col}${this.row}`);
     if (old.firstChild) old.removeChild(old.firstChild);
+    
+    // find new grid
+    const moveTo = document.getElementById(`${col}${row}`);
+    
+    // if another piece exists, capture it
+    if (moveTo.firstChild) {
+      const opp = board.pieces.find(p => p.col == col && p.row == row);
+      const index = board.pieces.indexOf(opp);
+      board.pieces.splice(index, 1);
+      moveTo.removeChild(moveTo.firstChild);
+    }
 
     // update position
-    this.row = row;
+    this.row = parseInt(row);
     this.col = col;
 
-    // find grid
-    const moveTo = document.getElementById(`${this.col}${this.row}`);
-    if (moveTo.firstChild) moveTo.removeChild(moveTo.firstChild);
-
-    // create and display icon
+    // create and place icon in grid
     const icon = document.createElement('i');
     icon.classList.add('fas');
     icon.classList.add(`fa-chess-${this.type}`);
