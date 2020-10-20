@@ -157,6 +157,7 @@ function kingCheck(piece) {
 
   // remove moves that puts king in danger
   const oppSide = board.pieces.filter(p => p.color != piece.color);
+  let threatened = oppSide.filter(opp => opp.moves.find(m => m[0] == piece.col && m[1] == piece.row) );
   
   for (let move of pos) {
 
@@ -169,21 +170,21 @@ function kingCheck(piece) {
       } else {
         danger = opp.moves.find(t => t == move);
         if (danger) break;
+        if (threatened) {
+          for (let capturer of threatened) {
+            danger = capturer.threats.find(t => t.id == move && t.level == 1);
+            if (danger) break;
+          }
+        }
+        if (danger) break;
+        danger = opp.threats.find(t => t.id == move && t.level == 0);
+        if (danger) break;
       }
     }
 
-    // check for dangers that may arise when the king captures a unit,
-    // unless the current move is threatened, in which case, remove this move
-    if (danger != undefined) {
+    // if the current move is dangerous, remove this move
+    if (danger) {
       pos = pos.filter(m => m != move);
-    } else {
-
-      const unit = oppSide.find(opp => opp.col == move[0] && opp.row == move[1]);
-      if (unit) {
-        const protected = oppSide.find(opp => opp.threats.find(t => t.id == move && t.level == 0) );
-        if (protected) pos = pos.filter(m => m != move);
-      }
-      
     }
     
   }

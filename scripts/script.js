@@ -36,70 +36,38 @@ function checkGrid(id) {
   // determine if grid is highlighted
   const grid = document.getElementById(id);
   const marked = document.querySelectorAll('.highlight');
-  
+  let target;
   for (let mark of marked) {
-    // if it is, move the piece to current grid,
-    // remove all highlights, switch sides, then update moves
-    if (grid === mark) {
-      selected.move(row, col);
-
-      // update pieces' possible moves
-      // update kings' possible moves last
-      const kings = board.pieces.filter(p => p.type == 'king');
-
-      for (let piece of board.pieces) {
-        if (!kings.includes(piece)) piece.checkMoves();
-      }
-
-      for (let king of kings) {
-        king.checkMoves();
-      }
-
-      // find opponent (of selected) King
-      const oppColor = (selected.color == "black") ? "white" : "black";
-      const oppKing = board.pieces.find(p => p.type == "king" && p.color == oppColor);
-      turn = oppColor;
-
-      // determine if opponent (of selected) King is in check
-      const selectSide = board.pieces.filter(p => p.color == selected.color);
-      const oppSide = board.pieces.filter(p => p.color == oppColor);
-
-      inCheck = false;
-
-      // finds any moves that threatens opponent (of selected) King
-      for (let soldier of selectSide) {
-        let threatening = soldier.moves.find(t => t[0] == oppKing.col && t[1] == oppKing.row );
-
-        // if there exists such a move, find if this threat can be removed
-        if (threatening) {
-
-          // check if threatening soldier can be captured
-          for (let opponent of oppSide) {
-            if (opponent.type == 'king') continue;
-            const breaker = opponent.moves.find(b => b[0] == soldier.col && b[1] == soldier.row);
-            if (breaker) {
-              opponent.moves = [breaker];
-              moveable.push(opponent);
-            }
-          }
-
-          // check if the king can escape
-          if (oppKing.moves.length > 0) moveable.push(oppKing);
-
-          if (moveable.length == 0) {
-            console.log('checkmate!');
-          }
-
-          inCheck = true;
-          break;
-        }
-      }
-
-      // remove highlights and selected
-      selected = undefined;
-      removeHighlights();
-      return;
+    if (mark === grid) {
+      target = mark;
+      break;
     }
+  }
+  
+  // if it is, move the piece to current grid,
+  // remove all highlights, switch sides, then update moves
+  if (target) {
+    selected.move(row, col);
+
+    // update pieces' possible moves
+    for (let piece of board.pieces) {
+      piece.checkMoves();
+    }
+    
+    // update king moves again to prevent mistakes in checking dangers
+    const kings = board.pieces.filter(p => p.type == 'king');
+    for (let king of kings) {
+      king.checkMoves();
+    }      
+
+    // determine if the next turn side will be in check/checkmate
+    const oppSide = (selected.color == 'black') ? 'white' : 'black';
+    determineCheck(oppSide);
+
+    // remove highlights and selected
+    selected = undefined;
+    removeHighlights();
+    return;
   }
 
   // if grid is not highlighted, remove all highlights
@@ -107,7 +75,7 @@ function checkGrid(id) {
 
   // find if grid contains a piece (that can be played)
   let available = board.pieces.filter(p => p.color == turn);
-  if (inCheck) available = available.filter(p => moveable.includes(p) && p.color == turn);
+  if (inCheck) available = available.filter(p => moveable.includes(p));
   const piece = available.find(p => p.row == row && p.col == col);
 
   if (piece) {
@@ -116,11 +84,11 @@ function checkGrid(id) {
     const oppSide = board.pieces.filter(p => p.color != piece.color);
     const king = board.pieces.find(p => p.type == 'king' && p.color == piece.color);
 
-    // stops if moving this piece will cause the king to be in check
+    // stop if moving this piece will cause the king to be in check
     if (king != piece) {
       for (let opp of oppSide) {
-        const kingThreat = opp.threats.find(t => t.col == king.col && t.row == king.row);
-        const pieceThreat = opp.threats.find(t => t.col == piece.col && t.row == piece.row);
+        const kingThreat = opp.threats.find(t => t.col == king.col && t.row == king.row && t.level == 2);
+        const pieceThreat = opp.threats.find(t => t.col == piece.col && t.row == piece.row && t.level == 0);
         if (kingThreat != undefined && pieceThreat != undefined) return;
       }
     }
@@ -135,4 +103,49 @@ function checkGrid(id) {
 
   }
 
+}
+
+// determines if a side is in check
+function determineCheck(side) {
+  
+  // decalre variables
+  const oppColor = (side == "black") ? "white" : "black";
+  const king = board.pieces.find(p => p.type == "king" && p.color == side);
+  const sidePieces = board.pieces.filter(p => p.color == side && p.type != 'king');
+  const oppPieces = board.pieces.filter(p => p.color == oppColor);
+
+  // assume it is not in check and there will be no pieces that can move in check
+  let check = false;
+  moveable = [];
+
+  // finds any moves that threatens the King
+  for (let enemy of oppPieces) {
+    let threatening = enemy.moves.find(e => e[0] == king.col && e == king.row );
+
+    // if there exists such a move, find if this threat can be removed
+    if (threatening) {
+
+      // check if the threaten(er) can be captured
+      for (let soldier of sidePieces) {
+        const breaker = soldier.moves.find(s => s[0] == enemy.col && s[1] == enemy.row);
+        if (breaker) {
+          opponent.moves = [breaker];
+          moveable.push(soldier);
+        }
+      }
+
+      // check if the king can escape
+      if (oppKing.moves.length > 0) moveable.push(oppKing);
+
+      // if no units can be moved, it's a checkmate!
+      if (moveable.length == 0) {
+        console.log('checkmate!');
+      }
+
+      check = true;
+      break;
+    }
+  }
+
+  return check;
 }

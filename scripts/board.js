@@ -34,11 +34,11 @@ class Board {
       new Piece(2, 'G', 'pawn', 'white'),
       new Piece(2, 'H', 'pawn', 'white'),
     
-      new Piece(5, 'A', 'rook'  , 'white'),
+      new Piece(1, 'A', 'rook'  , 'white'),
       new Piece(1, 'B', 'knight', 'white'),
       new Piece(1, 'C', 'bishop', 'white'),
       new Piece(1, 'D', 'queen' , 'white'),
-      new Piece(5, 'E', 'king'  , 'white'),
+      new Piece(1, 'E', 'king'  , 'white'),
       new Piece(1, 'F', 'bishop', 'white'),
       new Piece(1, 'G', 'knight', 'white'),
       new Piece(1, 'H', 'rook'  , 'white')
