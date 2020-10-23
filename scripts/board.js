@@ -3,6 +3,7 @@ class Board {
   constructor() {
     this.dom = document.querySelector('.board').children;
     this.pieces = [];
+    this.turn = 'white';
   }
 
   initalize() {

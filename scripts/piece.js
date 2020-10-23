@@ -47,6 +47,10 @@ class Piece {
 
   move(row, col) {
 
+    // prepare to report action
+    let action = 'walk';
+    let piece = [`${this.col}${this.row}`, `${col}${row}`];
+
     // remove current grid icon
     const old = document.getElementById(`${this.col}${this.row}`);
     if (old.firstChild) old.removeChild(old.firstChild);
@@ -60,6 +64,8 @@ class Piece {
       const index = board.pieces.indexOf(opp);
       board.pieces.splice(index, 1);
       moveTo.removeChild(moveTo.firstChild);
+      action = 'capture';
+      piece = opp;
     }
 
     // update position
@@ -74,6 +80,8 @@ class Piece {
 
     moveTo.appendChild(icon);
 
+    // log action
+    logAction(this, piece, action);
   }
 
 }

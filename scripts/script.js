@@ -2,7 +2,6 @@
 var selected;
 var inCheck = false;
 var moveable = [];
-var turn = 'white';
 
 // setup board
 const board = new Board();
@@ -62,7 +61,14 @@ function checkGrid(id) {
 
     // determine if the next turn side will be in check/checkmate
     const oppSide = (selected.color == 'black') ? 'white' : 'black';
-    determineCheck(oppSide);
+    board.turn = oppSide;
+    inCheck = determineCheck(oppSide);
+
+    // if check, log action
+    if (inCheck) {
+      const king = kings.find(p => p.color == oppSide);
+      logAction(selected, king, 'threaten');
+    }
 
     // remove highlights and selected
     selected = undefined;
@@ -74,14 +80,14 @@ function checkGrid(id) {
   removeHighlights();
 
   // find if grid contains a piece (that can be played)
-  let available = board.pieces.filter(p => p.color == turn);
+  let available = board.pieces.filter(p => p.color == board.turn);
   if (inCheck) available = available.filter(p => moveable.includes(p));
   const piece = available.find(p => p.row == row && p.col == col);
 
   if (piece) {
 
     // find opponent pieces and king on the side of this piece
-    const oppSide = board.pieces.filter(p => p.color != piece.color);
+    const oppSide = board.pieces.filter(p => p.color != piece.color && p.type != 'king' && p.type != 'knight' && p.type != 'pawn');
     const king = board.pieces.find(p => p.type == 'king' && p.color == piece.color);
 
     // stop if moving this piece will cause the king to be in check
@@ -89,7 +95,41 @@ function checkGrid(id) {
       for (let opp of oppSide) {
         const kingThreat = opp.threats.find(t => t.col == king.col && t.row == king.row && t.level == 2);
         const pieceThreat = opp.threats.find(t => t.col == piece.col && t.row == piece.row && t.level == 0);
-        if (kingThreat != undefined && pieceThreat != undefined) return;
+        
+        if (kingThreat && pieceThreat) {
+
+          // no exceptions for knights :(
+          if (piece.type == 'knight') return;
+
+          // check horizontally
+          if (king.row == piece.row) {
+            piece.moves = piece.moves.filter(m => m[1] == piece.row);
+
+          // check vertically
+          } else if (king.col == piece.col) {
+            piece.moves = piece.moves.filter(m => m[0] == piece.col);
+
+          // check diagonally
+          } else {
+            // rooks won't have exceptions to potential diagonal checks
+            if (piece.type == 'rook') return;
+
+            const pCol = toNumber(piece.col);
+            const oCol = toNumber(opp.col);
+            // leaves moves that makes the piece go between the king and the threatener,
+            // or better, captures the threatener
+            piece.moves = piece.moves.filter(m => {
+              if (m[0] == opp.col && m[1] == opp.row) return true;
+              const included = opp.moves.includes(m);
+              const mCol = toNumber(m[0]);
+              const vrDiff = (opp.row > piece.row) ? (m[1] < opp.row && m[1] > piece.row) : (m[1] > opp.row && m[1] < piece.row);
+              const hrDiff = (oCol < pCol) ? (mCol < pCol && mCol > oCol) : (mCol > pCol && mCol < oCol);
+              return included && hrDiff && vrDiff;
+            });
+          }
+
+          break;
+        }
       }
     }
 
@@ -101,6 +141,64 @@ function checkGrid(id) {
       document.getElementById(`${move[0]}${move[1]}`).classList.add('highlight');
     }
 
+  }
+
+}
+
+// creates a log
+function logAction(left, right, action) {
+
+  // creates the icon and the left icon
+  const icon = document.createElement('div');
+  const leftIcon = document.createElement('i');
+  leftIcon.className = `fas fa-chess-${left.type} ${left.color}`;
+
+  // determines whether to make an icon or a string for the right side
+  let rightSide;
+  if (right.length) {
+    rightSide = document.createElement('div');
+    const from = document.createElement('p');
+    const pointTo = document.createElement('div');
+    const to = document.createElement('p');
+    from.className = 'from-grid';
+    to.className = 'to-grid';
+    from.innerHTML = right[0];
+    to.innerHTML = right[1];
+    rightSide.appendChild(from);
+    rightSide.appendChild(pointTo);
+    rightSide.appendChild(to);
+  } else {
+    rightSide = document.createElement('i');
+    rightSide.className = `fas fa-chess-${right.type} ${right.color}`;
+  }
+
+  // creates the toast itself
+  const toast = document.createElement('div');
+
+  // moves all other logs down
+  const logs = document.querySelector('.inner-sidebar');
+  logs.scrollTop = 0;
+  const allToasts = logs.children;
+  if (allToasts.length > 0) {
+    allToasts[0].classList.replace('new-toast', 'old-toast');
+    for (let i = 1; i < Math.min(12, allToasts.length); i++) {
+      const clone = allToasts[i].cloneNode(true);
+      allToasts[i].replaceWith(clone);
+    }
+  }
+
+  // adds the toast to the log
+  logs.prepend(toast);
+  
+  // add components to the toast
+  toast.className = 'toast new-toast';
+  toast.appendChild(leftIcon);
+  toast.appendChild(icon);
+  toast.appendChild(rightSide);
+  icon.outerHTML = getSVG(action);
+  if (right.length) {
+    const arrow = rightSide.children[1];
+    arrow.outerHTML = getSVG('to');
   }
 
 }
@@ -120,8 +218,8 @@ function determineCheck(side) {
 
   // finds any moves that threatens the King
   for (let enemy of oppPieces) {
-    let threatening = enemy.moves.find(e => e[0] == king.col && e == king.row );
-
+    let threatening = enemy.moves.find(e => e[0] == king.col && e[1] == king.row );
+    
     // if there exists such a move, find if this threat can be removed
     if (threatening) {
 
@@ -129,13 +227,13 @@ function determineCheck(side) {
       for (let soldier of sidePieces) {
         const breaker = soldier.moves.find(s => s[0] == enemy.col && s[1] == enemy.row);
         if (breaker) {
-          opponent.moves = [breaker];
+          soldier.moves = [breaker];
           moveable.push(soldier);
         }
       }
 
       // check if the king can escape
-      if (oppKing.moves.length > 0) moveable.push(oppKing);
+      if (king.moves.length > 0) moveable.push(king);
 
       // if no units can be moved, it's a checkmate!
       if (moveable.length == 0) {
