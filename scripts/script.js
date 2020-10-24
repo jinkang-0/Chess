@@ -1,5 +1,7 @@
 // setup variables
 var selected;
+var selectedCell;
+var promoPawn;
 var inCheck = false;
 var moveable = [];
 
@@ -16,6 +18,7 @@ for (let piece of board.pieces) {
 window.addEventListener('mousedown', (event) => {
 
   // ignore grids and piece icons
+  if (event.originalTarget == undefined) return;
   const parent = event.originalTarget.parentElement.classList;
   if (parent.contains("board") || parent.contains("dark") || parent.contains("silver")) {
     return;
@@ -25,8 +28,14 @@ window.addEventListener('mousedown', (event) => {
 
 });
 
-// game functions
+// main game mechanics, runs when mouse clicks on a grid
 function checkGrid(id) {
+
+  // remove selected grid
+  if (selectedCell) {
+    selectedCell.classList.remove('selected');
+    selectedCell = undefined;
+  }
 
   // get grid row and column
   const row = id.slice(1, 2);
@@ -46,7 +55,12 @@ function checkGrid(id) {
   // if it is, move the piece to current grid,
   // remove all highlights, switch sides, then update moves
   if (target) {
-    selected.move(row, col);
+    const promoting = selected.move(row, col);
+    if (promoting) {
+      showPromo(selected);
+      removeHighlights();
+      return;
+    }
 
     // update pieces' possible moves
     for (let piece of board.pieces) {
@@ -111,6 +125,12 @@ function checkGrid(id) {
 
           // check diagonally
           } else {
+            const dy = king.row - piece.row;
+            const dx = toNumber(king.col) - toNumber(piece.col);
+            const slope = dy / dx;
+            // if it is not a straight diagonal, there is no danger
+            if (slope != 1) break;
+
             // rooks won't have exceptions to potential diagonal checks
             if (piece.type == 'rook') return;
 
@@ -128,6 +148,14 @@ function checkGrid(id) {
             });
           }
 
+          if (piece.moves.length <= 0) {
+            const id = `${opp.col}${opp.row}`;
+            document.getElementById(id).classList.add('danger');
+            setTimeout( () => {
+              document.getElementById(id).classList.remove('danger');
+            }, 1000);
+          }
+
           break;
         }
       }
@@ -135,7 +163,9 @@ function checkGrid(id) {
 
     // select this piece
     selected = piece;
-  
+    selectedCell = document.getElementById(`${piece.col}${piece.row}`);
+    selectedCell.classList.add('selected');
+    
     // highlight possible moves
     for (let move of piece.moves) {
       document.getElementById(`${move[0]}${move[1]}`).classList.add('highlight');
@@ -205,6 +235,9 @@ function logAction(left, right, action) {
 
 // determines if a side is in check
 function determineCheck(side) {
+
+  const threatenedCell = document.querySelector('.threatened');
+  if (threatenedCell) threatenedCell.classList.remove('threatened');
   
   // decalre variables
   const oppColor = (side == "black") ? "white" : "black";
@@ -240,10 +273,71 @@ function determineCheck(side) {
         console.log('checkmate!');
       }
 
+      document.getElementById(`${king.col}${king.row}`).classList.add('threatened');
+
       check = true;
       break;
     }
   }
 
   return check;
+}
+
+// shows pawn promotion screen
+function showPromo(pawn) {
+  
+  // show promo screen and show correct pawn color
+  const screen = document.getElementById('pawn-promo');
+  const promoBox = document.getElementById('promo-box');
+  screen.className = '';  
+  promoBox.className = pawn.color;
+  promoPawn = pawn;
+
+}
+
+// handles pawn promotion
+function promote(piece) {
+  
+  // play animation
+  const cell = document.getElementById(`${promoPawn.col}${promoPawn.row}`);
+  cell.classList.add('promoting');
+  setTimeout(() => {
+    cell.classList.remove('promoting');
+  }, 1000);
+
+  // set pawn type to that piece
+  promoPawn.type = piece;
+  setTimeout(() => {
+    promoPawn.show();
+    promoPawn = undefined;
+  }, 500);
+
+  // update pieces' possible moves
+  for (let piece of board.pieces) {
+    piece.checkMoves();
+  }
+  
+  // update king moves again to prevent mistakes in checking dangers
+  const kings = board.pieces.filter(p => p.type == 'king');
+  for (let king of kings) {
+    king.checkMoves();
+  }      
+
+  // determine if the next turn side will be in check/checkmate
+  const oppSide = (selected.color == 'black') ? 'white' : 'black';
+  board.turn = oppSide;
+  inCheck = determineCheck(oppSide);
+
+  // if check, log action
+  if (inCheck) {
+    const king = kings.find(p => p.color == board.turn);
+    logAction(selected, king, 'threaten');
+  }
+
+  selected = undefined;
+
+  // hide promotion screen
+  const screen = document.getElementById('pawn-promo');
+  screen.className = 'hidden';
+
 }

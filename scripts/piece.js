@@ -79,9 +79,18 @@ class Piece {
     icon.classList.add(this.color);
 
     moveTo.appendChild(icon);
-
+    
     // log action
     logAction(this, piece, action);
+
+    // check for pawn promotion
+    if (this.type == 'pawn') {
+      const reachedGoal = (this.color == 'black') ? this.row == 1 : this.row == 8;
+      if (reachedGoal) return true;
+    }
+
+    return false;
+
   }
 
 }
