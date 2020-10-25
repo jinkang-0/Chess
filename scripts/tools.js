@@ -1,3 +1,10 @@
+/**
+ * 
+ * This script adds tools to help with
+ * implementing mechanics
+ * 
+ */
+
 // converts column letters to numbers for comparison
 function toNumber(letter) {
   return letter.charCodeAt(0) - 65;
@@ -107,14 +114,6 @@ function rayCheck(piece, colDir, rowDir) {
 
 }
 
-// remove all highlighted grids
-function removeHighlights() {
-  const marked = document.querySelectorAll('.highlight');
-  for (let mark of marked) {
-    mark.classList.remove('highlight');
-  }
-}
-
 // returns svgs in string format
 function getSVG(type) {
   switch (type) {
@@ -128,5 +127,12 @@ function getSVG(type) {
       return '<svg width="64" height="49" viewBox="0 0 64 49" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M63.5 24.5L43.1774 48.5V34.1L0.500002 34.1V14.3L43.1774 14.3V0.5L63.5 24.5Z" fill="#FFC700"/></svg>';
     case 'to':
       return '<svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0H4.35556V4.52525L8.55556 7.27273V4.0404L14 9.85859L8.55556 16V12.4444L0 7.27273V0Z" fill="#C4C4C4"/></svg>';
+  }
+}
+
+// remove all child elements of a DOM element
+function removeChildren(elem) {
+  while (elem.firstChild) {
+    elem.removeChild( elem.firstChild );
   }
 }

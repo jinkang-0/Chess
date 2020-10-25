@@ -8,14 +8,16 @@
   <title>Chess</title>
   
   <!-- stylesheets -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/animations.css">
   <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 
   <!-- scripts -->
-  <script src="scripts/piece.js"></script>
+  <script src="scripts/objects/piece.js"></script>
+  <script src="scripts/objects/board.js"></script>
   <script src="scripts/tools.js"></script>
   <script src="scripts/moves.js"></script>
-  <script src="scripts/board.js"></script>
+  <script src="scripts/display.js"></script>
 
 </head>
 <body>
@@ -133,14 +135,8 @@
   <div class="sidebar">
 
     <div class="banner">
-      <div>
-        <i class="fas fa-chess-king white"></i>
-        <span id="white-score">0</span>
-      </div>
-      <div>
-        <i class="fas fa-chess-king black"></i>
-        <span id="black-score">0</span>
-      </div>
+      <i id="turn-icon" class="fas fa-chess-king"></i>
+      <span>'s Turn</span>
     </div>
 
     <div class="inner-sidebar">
@@ -166,6 +162,25 @@
         <div onclick="promote('bishop')" class="silver"><i class="fas fa-chess-bishop"></i></div>
         <div onclick="promote('queen')" class="silver"><i class="fas fa-chess-queen"></i></div>
       </div>
+    </div>
+  </div>
+
+  <div id="end-screen" class="hidden">
+    <div class="checkmate">
+      <h1>Checkmate!</h1>
+      
+      <div id="w-stat" class="stats">
+        <i class="fas fa-chess-king"></i>
+        <span id="w-score">0</span>
+      </div>
+      
+      <div id="b-stat" class="stats">
+        <i class="fas fa-chess-king"></i>
+        <span id="b-score">0</span>
+      </div>
+
+      <button onclick="restart()" id="restart-button">Restart</button>
+
     </div>
   </div>
 

@@ -1,3 +1,10 @@
+/**
+ * 
+ * This script contains functions for checking
+ * possible moves, for each type of chess piece
+ * 
+ */
+
 function pawnCheck(piece) {
 
   // declare variables
@@ -136,24 +143,29 @@ function kingCheck(piece) {
   // get position
   const row = piece.row;
   const col = piece.col;
-  let newCol;
+  var newCol;
   var pos = [];
+  piece.threats = [];
 
   // check west
   newCol = toLetter( toNumber(col) - 1 );
   for (let i = -1; i < 2; i++) {
     if (!blocked(newCol, row+i) || canCapture(piece, newCol, row+i)) pos.push(`${newCol}${row+i}`);
+    piece.threats.push({id: `${newCol}${row+i}`, col: newCol, row: row+i, level: 0});
   }
 
   // check east
   newCol = toLetter( toNumber(col) + 1 );
   for (let i = 1; i > -2; i--) {
     if (!blocked(newCol, row+i) || canCapture(piece, newCol, row+i)) pos.push(`${newCol}${row+i}`);
+    piece.threats.push({id: `${newCol}${row+i}`, col: newCol, row: row+i, level: 0});
   }
 
   // check top and bottom
   if (!blocked(col, row-1) || canCapture(piece, col, row-1)) pos.push(`${col}${row-1}`);
   if (!blocked(col, row+1) || canCapture(piece, col, row+1)) pos.push(`${col}${row+1}`);
+  piece.threats.push({id: `${col}${row-1}`, col: col, row: row-1, level: 0});
+  piece.threats.push({id: `${col}${row+1}`, col: col, row: row+1, level: 0});
 
   // remove moves that puts king in danger
   const oppSide = board.pieces.filter(p => p.color != piece.color);
@@ -164,7 +176,7 @@ function kingCheck(piece) {
     // checks for dangers in the king's moves
     let danger;
     for (let opp of oppSide) {
-      if (opp.type == 'pawn') {
+      if (opp.type == 'pawn' || opp.type == 'king') {
         danger = opp.threats.find(t => t.id == move);
         if (danger) break;
       } else {

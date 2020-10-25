@@ -1,0 +1,108 @@
+/* 
+  modal boxes
+*/
+
+/* pawn promotion box */
+#promo-box { animation: dropdown 500ms ease-out; }
+@keyframes dropdown {
+  from { opacity: 0; transform: translateY(-50%); }
+  to { opacity: 1; transform: translateY(0) }
+}
+
+/* checkmate box */
+.checkmate { animation: wipe-across 300ms ease-in }
+@keyframes wipe-across {
+  from { transform: scaleX(0) }
+  to { transform: scaleX(1) }
+}
+
+.checkmate h1 { animation: slam 2100ms ease-in-out forwards }
+@keyframes slam {
+  from { opacity: 0; transform: scale(2) }
+  15% { opacity: 0; transform: scale(2) }
+  40% { opacity: 1; transform: scale(1) }
+  60% { transform: scale(1) }
+  to { transform: translateY(-100%) }
+}
+
+/* 3/5 , 1/7 = 5/21 */
+
+.stats.shown { animation: appear 300ms ease-in-out forwards }
+#restart-button.shown { animation: appear 300ms ease-in-out 500ms forwards }
+@keyframes appear {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+#w-stat.winner { animation: w-slideshow 1800ms ease-in-out 2100ms forwards; }
+@keyframes w-slideshow {
+  from { opacity: 0; }
+  20% { opacity: 1; transform: translate(0, -30%) }
+  60% { opacity: 1; transform: translate(0, -30%) }
+  to { opacity: 1; transform: translate(-100%, -30%) }
+}
+
+#b-stat.winner { animation: b-slideshow 1800ms ease-in-out 2100ms forwards }
+@keyframes b-slideshow {
+  from { opacity: 0; }
+  20% { opacity: 1; transform: translate(0, -30%) }
+  70% { opacity: 1; transform: translate(0, -30%) }
+  to { opacity: 1; transform: translate(100%, -30%) }
+}
+
+.winner i { animation: pop-up 640ms ease-in-out 1500ms forwards }
+@keyframes pop-up {
+  from { transform: scale(0.8) }
+  50% { transform: scale(1.2) }
+  to { transform: scale(1) }
+}
+
+
+
+
+/* 
+  animations within the board 
+*/
+
+/* danger triangle */
+.threatened::before { animation: inCheck 2s ease-in-out infinite; }
+@keyframes inCheck {
+  from { opacity: 0.7; }
+  50% { opacity: 0.3; }
+  to { opacity: 0.7; }
+}
+
+.danger::before { animation: warning 1s ease-in-out; }
+@keyframes warning {
+  from { opacity: 0.6; }
+  to { opacity: 0 }
+}
+
+/* pawn promotion */
+.promoting::after { animation: promotion 1s ease-in-out; }
+@keyframes promotion {
+  from { transform: scaleY(0); transform-origin: top; }
+  25% { transform: scaleY(1); transform-origin: top; }
+  26% { transform: scaleY(1); transform-origin: bottom; }
+  to { transform: scaleY(0); transform-origin: bottom; }
+}
+
+
+
+/* 
+  animations within the sidebars 
+*/
+
+/* toasts pop up */
+.new-toast { animation: slide-up 500ms ease-in-out; }
+@keyframes slide-up {
+  from { transform: translateY(50%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* toasts slide down */
+.old-toast { animation: slide-down 500ms ease-out; }
+@keyframes slide-down {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
