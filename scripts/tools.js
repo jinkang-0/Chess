@@ -18,9 +18,10 @@ function toLetter(number) {
 // check boundaries for a cell
 function outOfBounds(cell) {
   const col = toNumber(cell[0]);
-  const row = parseInt(cell[1]);
+  const row = parseInt(cell.slice(1));
   if (col < 0 || col > 7) return true;
   if (row < 1 || row > 8) return true;
+  return false;
 }
 
 // check if piece can move to destination

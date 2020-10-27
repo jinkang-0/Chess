@@ -28,6 +28,9 @@ body {
   place-items: center;
 }
 
+button:hover { filter: brightness(1.1); }
+button:active { filter: brightness(0.9); }
+
 /* board */
 
 .container {
@@ -145,6 +148,7 @@ body {
   height: 100vh;
   display: grid;
   grid-template-rows: 75px auto;
+  position: relative;
 }
 
 .banner {
@@ -234,6 +238,43 @@ body {
   grid-row: 1/3;
 }
 
+/* stalemate */
+#stalemate-option {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  background: darkslateblue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  bottom: 0;
+  opacity: 1;
+  transition: 200ms;
+  transform-origin: bottom;
+}
+
+#stalemate-option.hidden { 
+  opacity: 0; 
+  transform: scaleY(0);
+}
+
+#stalemate-option p {
+  text-align: center;
+  width: 80%;
+  margin-bottom: 5px;
+}
+
+#stalemate-option button {
+  border: 2px solid var(--board);
+  border-radius: 10px;
+  padding: 5px 10px;
+  background: var(--banner);
+  outline: none;
+  color: lightgray;
+  cursor: pointer;
+}
+
 /* pawn promotion screen */
 #pawn-promo {
   width: 100vw;
@@ -300,7 +341,7 @@ body {
   font-size: 3rem;
 }
 
-/* checkmate screen */
+/* end screen */
 #end-screen {
   width: 100vw;
   height: 100vh;
@@ -318,7 +359,7 @@ body {
   display: none;
 }
 
-.checkmate {
+.end-box {
   width: 100vw;
   height: 40vh;
   background: var(--banner);
@@ -330,7 +371,7 @@ body {
   align-items: center;
 }
 
-.checkmate h1 {
+.end-box h1 {
   font-size: 8rem;
 }
 
@@ -371,14 +412,6 @@ body {
   position: absolute;
   transform: translateY(200%);
   box-shadow: 1px 2px 5px var(--board);
-}
-
-#restart-button:hover {
-  filter: brightness(1.1);
-}
-
-#restart-button:active {
-  filter: brightness(0.9);
 }
 
 /* media queries */

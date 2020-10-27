@@ -191,7 +191,7 @@ function moveHandler() {
 
   // update pieces' possible moves
   board.nextTurn();
-  board.refreshMoveSet();   
+  board.refreshMoveset();
 
   // determine if the next turn side will be in check/checkmate
   const oppSide = (selected.color == 'black') ? 'white' : 'black';

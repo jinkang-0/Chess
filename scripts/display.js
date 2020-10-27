@@ -27,7 +27,7 @@ function removeHighlights() {
     selectedCell.classList.remove('selected');
     selectedCell = undefined;
   }
-  
+
 }
 
 // creates a log
@@ -140,6 +140,9 @@ function checkmate(winners) {
   const stats = document.getElementsByClassName('stats');
   const winner = stats.namedItem(`${winners[0]}-stat`);
   winner.className = 'stats winner';
+
+  // set end text
+  document.getElementById('end-text').innerHTML = 'Checkmate!';
   
   // start animation
   const screen = document.getElementById('end-screen');
@@ -148,7 +151,6 @@ function checkmate(winners) {
   // update score
   setTimeout(() => {
     if (winner.classList.contains('winner')) {
-      console.log('updated score');
       winner.children.item(1).innerHTML = winScore;
     }
   }, 2850);
@@ -156,7 +158,6 @@ function checkmate(winners) {
   // show all scores
   setTimeout(() => {
     if (winner.classList.contains('winner')) {
-      console.log('showed all scores');
       const otherStat = stats.namedItem(`${other[0]}-stat`);
       otherStat.classList.add('shown');
       otherStat.children.item(1).innerHTML = otherScore;
@@ -164,4 +165,37 @@ function checkmate(winners) {
     }
   }, 3900);
 
+}
+
+// display stalemate screen
+function stalemate() {
+
+  // hide stalemate option
+  hideDraw();
+
+  // set end text
+  document.getElementById('end-text').innerHTML = 'Stalemate!';
+
+  // start animation
+  const screen = document.getElementById('end-screen');
+  screen.classList.remove('hidden');
+
+  // show all scores
+  setTimeout(() => {
+    const stats = document.getElementsByClassName('stats');
+    stats.item(0).classList.add('shown');
+    stats.item(1).classList.add('shown');
+    document.getElementById('restart-button').className = 'shown';
+  }, 2200);
+
+}
+
+// show stalemate option
+function showDraw() {
+  document.getElementById('stalemate-option').className = '';
+}
+
+// hide stalemate option
+function hideDraw() {
+  document.getElementById('stalemate-option').className = 'hidden';
 }

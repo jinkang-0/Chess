@@ -3,42 +3,58 @@ class Board {
   constructor() {
     this.pieces = [];
     this.turn;
+    this.stales = 0;
   }
 
   nextTurn() {
     this.turn = (this.turn == 'black') ? 'white' : 'black';
     document.getElementById('turn-icon').className = `fas fa-chess-king ${this.turn}`;
+
+    // check if stale counts are enough to be a stalemate
+    if (this.stales > 75) {
+      stalemate();
+    } else if (this.stales > 50) {
+      showDraw();
+    } else {
+      const nonkings = this.pieces.filter(p => p.type != 'king');
+      (nonkings.length == 0) ? stalemate() : hideDraw();
+    }
+
+    this.stales++;
   }
 
-  // check moves all pieces, then kings
-  refreshMoveSet() {
-    const kings = this.pieces.filter(p => p.type == 'king');
+  // check moves for all pieces, then kings
+  refreshMoveset() {
+    // update times
     this.pieces.forEach(piece => {
       if (piece.previous) piece.previous.time++;
     });
-
+    
+    // refresh moveset of all pieces
     for (let piece of this.pieces) {
       piece.checkMoves();
     }
     
+    // determine potential check and refresh king moveset
     inCheck = determineCheck(this.turn);
+    const kings = this.pieces.filter(p => p.type == 'king');
     for (let king of kings) king.checkMoves();
   }
 
   initalize() {
-    this.turn = 'black';
-    // this.constructDefault();
+    this.turn = 'white';
+    this.constructDefault();
 
-    this.pieces = [
-      new Piece('B8', 'king', 'black'),
-      new Piece('E1', 'king', 'white'),
-      new Piece('E2', 'pawn', 'white'),
-      new Piece('D4', 'pawn', 'black'),
-      new Piece('F5', 'pawn', 'white'),
-      new Piece('E7', 'pawn', 'black')
-    ];
+    // this.pieces = [
+    //   new Piece('B8', 'king', 'black'),
+    //   new Piece('E1', 'king', 'white'),
+    //   new Piece('E2', 'pawn', 'white'),
+    //   new Piece('D4', 'pawn', 'black'),
+    //   new Piece('F5', 'pawn', 'white'),
+    //   new Piece('E7', 'pawn', 'black')
+    // ];
 
-    this.refreshMoveSet();
+    this.refreshMoveset();
   }
 
   constructDefault() {

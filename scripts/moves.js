@@ -174,13 +174,14 @@ function kingCheck(piece) {
 
   const oppSide = board.pieces.filter(p => p.color != piece.color);
 
-  // check for castling
-  if (piece.moves == 0 && !inCheck) {
+  // check for castling if king has not moved and is not in check
+  if (piece.previous == undefined && !inCheck) {
     const rooks = board.pieces.filter(p => p.type == 'rook' && p.color == piece.color);
     const nonpawns = oppSide.filter(p => p.type != 'pawn');
     for (let rook of rooks) {
-      if (rook.moves > 0) continue;
-      if (rook.threats.find(t => t.level == 0 && t.id == t.id)) {
+      if (rook.moves != undefined) continue;
+      // find a rook that has clear sight of king and has not moved
+      if (rook.threats.find(t => t.level == 0 && t.id == piece.id)) {
         const rCol = rook.col;
         const kCol = piece.col;
         let dangerQ;
@@ -211,42 +212,15 @@ function kingCheck(piece) {
 
   // remove moves that puts king in danger
   let threatened = oppSide.filter(opp => opp.moveset.find(m => m == piece.id) );
-  
-  /**
-   * 
-   * TODO:
-   * improve this
-   * 
-   */
 
-  for (let move of pos) {
-
-    // checks for dangers in potential moves
-    let danger;
-    for (let opp of oppSide) {
-      if (opp.type == 'pawn' || opp.type == 'king') {
-        danger = opp.threats.find(t => t.id == move);
-        if (danger) break;
-      } else {
-        danger = opp.moveset.find(m => m == move);
-        if (danger) break;
-        if (threatened) {
-          for (let capturer of threatened) {
-            danger = capturer.threats.find(t => t.id == move && t.level == 1);
-            if (danger) break;
-          }
-        }
-        if (danger) break;
-        danger = opp.threats.find(t => t.id == move && t.level == 0);
-        if (danger) break;
-      }
+  for (let opp of oppSide) {
+    if (opp.type == 'pawn' || opp.type == 'king') {
+      pos = pos.filter(m => opp.threats.find(t => t.id == m) == undefined);
+    } else {
+      pos = pos.filter(m => opp.moveset.find(t => t == m) == undefined);
+      if (threatened) for (let capturer of threatened) pos = pos.filter(m => capturer.threats.find(t => t.id == m && t.level == 1) == undefined);
+      pos = pos.filter(m => opp.threats.find(t => t.id == m && t.level == 0) == undefined);
     }
-
-    // if the current move is dangerous, remove this move
-    if (danger) {
-      pos = pos.filter(m => m != move);
-    }
-    
   }
 
   // update possible moves

@@ -9,14 +9,14 @@
   to { opacity: 1; transform: translateY(0) }
 }
 
-/* checkmate box */
-.checkmate { animation: wipe-across 300ms ease-in }
+/* end scren box */
+.end-box { animation: wipe-across 300ms ease-in }
 @keyframes wipe-across {
   from { transform: scaleX(0) }
   to { transform: scaleX(1) }
 }
 
-.checkmate h1 { animation: slam 2100ms ease-in-out forwards }
+.end-box h1 { animation: slam 2100ms ease-in-out forwards }
 @keyframes slam {
   from { opacity: 0; transform: scale(2) }
   15% { opacity: 0; transform: scale(2) }
@@ -24,8 +24,6 @@
   60% { transform: scale(1) }
   to { transform: translateY(-100%) }
 }
-
-/* 3/5 , 1/7 = 5/21 */
 
 .stats.shown { animation: appear 300ms ease-in-out forwards }
 #restart-button.shown { animation: appear 300ms ease-in-out 500ms forwards }

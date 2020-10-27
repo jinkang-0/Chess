@@ -143,6 +143,11 @@
       <!-- to be added with script -->
     </div>
 
+    <div id="stalemate-option" class="hidden">
+      <p>There has been no pawn moves or captures in 50 turns...</p>
+      <button onclick="stalemate()">Declare Stalemate</button>
+    </div>
+
   </div>
 
   <div id="pawn-promo" class="hidden">
@@ -166,8 +171,8 @@
   </div>
 
   <div id="end-screen" class="hidden">
-    <div class="checkmate">
-      <h1>Checkmate!</h1>
+    <div class="end-box">
+      <h1 id="end-text">Checkmate!</h1>
       
       <div id="w-stat" class="stats">
         <i class="fas fa-chess-king"></i>

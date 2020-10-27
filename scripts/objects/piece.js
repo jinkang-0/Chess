@@ -49,14 +49,23 @@ class Piece {
   }
 
   capture(piece) {
+    // reset stale count
+    board.stales = 0;
+
+    // remove piece from board and dom
     const index = board.pieces.indexOf(piece);
     const cell = document.getElementById(piece.id);
     board.pieces.splice(index, 1);
     cell.removeChild(cell.firstChild);
+
+    // log capture
     logAction(this, piece, 'capture');
   }
 
   move(cell) {
+
+    // reset stales if this is a pawn
+    if (this.type == 'pawn') board.stales = 0;
 
     // change previous
     this.previous = {
