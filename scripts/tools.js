@@ -15,70 +15,68 @@ function toLetter(number) {
   return String.fromCharCode(number + 65);
 }
 
-// check boundaries for column or row
-function outOfBounds(any) {
-  if (typeof any == 'string') {
-    return (toNumber(any) < 0 || toNumber(any) >= 8);
-  } else if (typeof any == 'number') {
-    return (any <= 0 || any > 8);
-  } else {
-    console.log('something went wrong');
-  }
+// check boundaries for a cell
+function outOfBounds(cell) {
+  const col = toNumber(cell[0]);
+  const row = parseInt(cell[1]);
+  if (col < 0 || col > 7) return true;
+  if (row < 1 || row > 8) return true;
 }
 
 // check if piece can move to destination
-function blocked(col, row) {
+function blocked(cell) {
   // check boundaries
-  if (outOfBounds(col) || outOfBounds(row)) return true;
+  if (outOfBounds(cell)) return true;
 
   // determine if target has a piece
-  const dest = board.pieces.find(p => p.col == col && p.row == row);
+  const dest = board.pieces.find(p => p.id == cell);
   return (dest != undefined);
 }
 
 // check if piece can capture at destination
-function canCapture(piece, col, row) {
+function canCapture(piece, cell) {
   // check boundaries
-  if (outOfBounds(col) || outOfBounds(row)) return false;
+  if (outOfBounds(cell)) return false;
 
   // determine if target is from opposing side
-  const dest = board.pieces.find(p => p.col == col && p.row == row);
+  const dest = board.pieces.find(p => p.id == cell);
   if (dest == undefined) return false;
   return (dest.color != piece.color);
 }
 
 // for rook, bishop, and queen
-function rayCheck(piece, colDir, rowDir) {
+function rayCheck(piece, hrDir, vrDir) {
   // declare variables
-  const colInc = colDir;
-  const rowInc = rowDir;
+  let colInc = hrDir;
+  let rowInc = vrDir;
   var pos = [];
   var checkThreats = false;
 
   // check in a line (diagonal or straight)
   for (let i = 0; i < 8; i++) {
-    let newCol = toLetter(toNumber(piece.col) + colDir);
-    let newRow = piece.row + rowDir;
+    const newCol = toLetter(piece.col + colInc);
+    const newRow = piece.row + rowInc;
+    const newCell = `${newCol}${newRow}`
 
     // check for empty space or other pieces
-    if ( !blocked(newCol, newRow) ) {
+    if ( !blocked(newCell) ) {
 
       if (checkThreats) {
         piece.threats.push({
-          id: `${newCol}${newRow}`,
+          id: newCell,
           row: newRow,
           col: newCol,
           level: 1
         });
       } else {
-        pos.push(`${newCol}${newRow}`);
+        pos.push(newCell);
       }
 
-    } else if ( canCapture(piece, newCol, newRow) && !checkThreats ) {
+    } else if ( canCapture(piece, newCell) && !checkThreats ) {
 
-      pos.push(`${newCol}${newRow}`);
+      pos.push(newCell);
       piece.threats.push({
-        id: `${newCol}${newRow}`,
+        id: newCell,
         row: newRow,
         col: newCol,
         level: 0
@@ -87,16 +85,16 @@ function rayCheck(piece, colDir, rowDir) {
 
     } else {
       
-      let l = 0;
+      let lv = 0;
 
-      if (checkThreats) l = 2;
+      if (checkThreats) lv = 2;
 
-      if (!outOfBounds(newCol) && !outOfBounds(newRow)) {
+      if (!outOfBounds(newCell)) {
         piece.threats.push({
-          id: `${newCol}${newRow}`,
+          id: newCell,
           row: newRow,
           col: newCol,
-          level: l
+          level: lv
         });
       }
       
@@ -106,8 +104,8 @@ function rayCheck(piece, colDir, rowDir) {
     }
 
     // keep moving
-    colDir += colInc;
-    rowDir += rowInc;
+    colInc += hrDir;
+    rowInc += vrDir;
   }
 
   return pos;

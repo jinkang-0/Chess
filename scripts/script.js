@@ -26,9 +26,8 @@ for (let piece of board.pieces) {
 // when mouse is down, clear all highlights
 window.addEventListener('mousedown', (event) => {
 
-  // ignore grids and piece icons
-  if (event.originalTarget == undefined) return;
-  const parent = event.originalTarget.parentElement.classList;
+  // unless it's in the grid, remove highlights
+  const parent = event.target.parentElement.classList;
   if (parent.contains("board") || parent.contains("dark") || parent.contains("silver")) {
     return;
   }
@@ -40,20 +39,11 @@ window.addEventListener('mousedown', (event) => {
 // main game mechanics, runs when mouse clicks on a grid
 function checkGrid(id) {
 
-  // remove selected grid
-  if (selectedCell) {
-    selectedCell.classList.remove('selected');
-    selectedCell = undefined;
-  }
-
-  // get grid row and column
-  const row = id.slice(1, 2);
-  const col = id.slice(0, 1);
-
   // determine if grid is highlighted
   const grid = document.getElementById(id);
   const marked = document.querySelectorAll('.highlight');
   let target;
+  
   for (let mark of marked) {
     if (mark === grid) {
       target = mark;
@@ -61,43 +51,63 @@ function checkGrid(id) {
     }
   }
   
-  // if it is, move the piece to current grid,
-  // remove all highlights, switch sides, then update moves
+  // if it is, move the piece to current grid
   if (target) {
-    const promoting = selected.move(row, col);
-    if (promoting) {
-      showPromo(selected);
-      removeHighlights();
-      return;
-    }
-
-    moveHandler();
+    const promoting = selected.move(id);
+    (promoting) ? showPromo(selected) : moveHandler();
+    
     removeHighlights();
     return;
+  // if not, find if it is a special move
+  } else {
+    const specials = document.querySelectorAll('.special');
+    if (specials) {
+      for (let sp of specials) {
+        target = (sp === grid) ? sp : undefined;
+        if (target) {
+          const type = (sp.classList.contains('castling')) ? 'castling' : 'enpassant';
+          const specialMove = selected.specials.find(s => s.type == type && s.to == sp.id);
+          const link = board.pieces.find(p => p.id == specialMove.link);
+          
+          if (specialMove.effect == 'move') {
+            link.move(specialMove.linkto);
+          } else if (specialMove.effect == 'capture') {
+            selected.capture(link);
+          }
+          
+          selected.move(id);
+
+          moveHandler();
+          removeHighlights();
+          return;
+        }
+      }
+    }
   }
 
   // if grid is not highlighted, remove all highlights
   removeHighlights();
 
-  // find if grid contains a piece (that can be played)
+  // find if the selected grid contains a piece (that can be played)
   let available = board.pieces.filter(p => p.color == board.turn);
   if (inCheck) available = available.filter(p => moveable.includes(p));
-  const piece = available.find(p => p.row == row && p.col == col);
+  const piece = available.find(p => p.id == id);
 
+  // if it exists:
   if (piece) {
 
     // find opponent pieces and king on the side of this piece
     const oppSide = board.pieces.filter(p => p.color != piece.color && p.type != 'king' && p.type != 'knight' && p.type != 'pawn');
     const king = board.pieces.find(p => p.type == 'king' && p.color == piece.color);
 
-    // stop if moving this piece will cause the king to be in check
+    // investigate if moving this piece will cause the king to be in check
     if (king != piece) {
       for (let opp of oppSide) {
-        const kingThreat = opp.threats.find(t => t.col == king.col && t.row == king.row && t.level == 2);
-        const pieceThreat = opp.threats.find(t => t.col == piece.col && t.row == piece.row && t.level == 0);
-        
+        const kingThreat = opp.threats.find(t => t.id == king.id && t.level == 2);
+        const pieceThreat = opp.threats.find(t => t.id == piece.id && t.level == 0);
+        // if it will, reduce its moves s.t. they won't cause the king to be in check
+        // if it has no safe moves, stop execution early
         if (kingThreat && pieceThreat) {
-          // if there are no moves, cut execution early
           if ( !altCheck(piece, opp) ) return;
           break;
         }
@@ -106,18 +116,25 @@ function checkGrid(id) {
 
     // select this piece
     selected = piece;
-    selectedCell = document.getElementById(`${piece.col}${piece.row}`);
+    selectedCell = document.getElementById(piece.id);
     selectedCell.classList.add('selected');
     
     // highlight possible moves
-    for (let move of piece.moves) {
-      document.getElementById(`${move[0]}${move[1]}`).classList.add('highlight');
+    for (let move of piece.moveset) {
+      document.getElementById(move).classList.add('highlight');
+    }
+
+    // show specials
+    for (let sp of piece.specials) {
+      const spEffect = document.getElementById(sp.to).classList;
+      spEffect.add('special');
+      spEffect.add(sp.type);
+      spEffect.add(piece.color);
+      spEffect.add(sp.linkdir);
     }
 
   }
-
 }
-
 
 // finds moves that won't put king in check
 // returns true if it can move, false otherwise
@@ -129,25 +146,24 @@ function altCheck(piece, opp) {
   const king = board.pieces.find(p => p.type == 'king' && p.color == piece.color);
 
   // check horizontally, vertically, or diagonally
-  if (king.row == piece.row) { piece.moves = piece.moves.filter(m => m[1] == piece.row); } 
-  else if (king.col == piece.col) { piece.moves = piece.moves.filter(m => m[0] == piece.col); } 
+  if (king.row == piece.row) { piece.moveset = piece.moveset.filter(m => m[1] == piece.id[1]); } 
+  else if (king.col == piece.col) { piece.moveset = piece.moveset.filter(m => m[0] == piece.id[0]); } 
   else {
     // if it is not a straight diagonal, there is no danger
     const dy = king.row - piece.row;
-    const dx = toNumber(king.col) - toNumber(piece.col);
+    const dx = king.col - piece.col;
     const slope = Math.abs(dy / dx);
     if (slope != 1) return true;
 
     // rooks cannot respond to a diagonal threat
     if (piece.type == 'rook') return false;
 
-    const pCol = toNumber(piece.col);
-    const oCol = toNumber(opp.col);
-
     // finds safe moves for the piece (in between attack or attacker itself)
-    piece.moves = piece.moves.filter(m => {
-      if (m[0] == opp.col && m[1] == opp.row) return true;
-      const included = opp.moves.includes(m);
+    const pCol = piece.col;
+    const oCol = opp.col;
+    piece.moveset = piece.moveset.filter(m => {
+      if (m == opp.id) return true;
+      const included = opp.moveset.includes(m);
       const mCol = toNumber(m[0]);
       const vrDiff = (opp.row > piece.row) ? (m[1] < opp.row && m[1] > piece.row) : (m[1] > opp.row && m[1] < piece.row);
       const hrDiff = (oCol < pCol) ? (mCol < pCol && mCol > oCol) : (mCol > pCol && mCol < oCol);
@@ -156,10 +172,10 @@ function altCheck(piece, opp) {
   }
 
   // if the piece has no moves left, show it cannot move
-  if (piece.moves.length > 0) {
+  if (piece.moveset.length > 0) {
     return true;
   } else {
-    const grid = document.getElementById(`${opp.col}${opp.row}`);
+    const grid = document.getElementById(opp.id);
     if (!grid.classList.contains('danger')) {
       grid.classList.add('danger');
       setTimeout( () => {
@@ -174,12 +190,11 @@ function altCheck(piece, opp) {
 function moveHandler() {
 
   // update pieces' possible moves
+  board.nextTurn();
   board.refreshMoveSet();   
 
   // determine if the next turn side will be in check/checkmate
   const oppSide = (selected.color == 'black') ? 'white' : 'black';
-  board.nextTurn();
-  inCheck = determineCheck(oppSide);
 
   // if check, log action
   if (inCheck) {
@@ -211,68 +226,72 @@ function determineCheck(side) {
 
   // finds any moves that directly threatens the King
   for (let enemy of oppPieces) {
-    let threatening = enemy.moves.find(m => m[0] == king.col && m[1] == king.row );
-    
-    // if there exists such a move, find if this threat can be removed
-    if (threatening) {
+    let threatening = enemy.moveset.find(m => m == king.id);
+    if (threatening == undefined) continue;
 
-      // check if the threaten(er) can be captured
-      // or if the threat can be blocked
-      for (let soldier of sidePieces) {
-        const breaker = soldier.moves.find(s => s[0] == enemy.col && s[1] == enemy.row);
-        if (breaker) {
-          soldier.moves = [breaker];
-          moveable.push(soldier);
+    // if threat exists, find if it can be intervened
+    for (let soldier of sidePieces) {
 
-        // if enemy moves in a line, find if it can be blocked
-        } else if (enemy.type == 'rook' || enemy.type == 'bishop' || enemy.type == 'queen') {
-          if (enemy.col == king.col) {
-            // vertical
-            soldier.moves = soldier.moves.filter(m => {
-              const included = enemy.moves.includes(m);
-              const between = (king.row < enemy.row) ? (m.row < enemy.row && m.row > king.row) : (m.row > enemy.row && m.row < king.row);
-              return included && between;
-            });
-          } else if (enemy.row == king.row) {
-            // horizontal
-            const kCol = toNumber(king.col);
-            const eCol = toNumber(enemy.col);
-            soldier.moves = soldier.moves.filter(m => {
-              const included = enemy.moves.includes(m);
-              const mCol = toNumber(m[0]);
-              const between = (kCol < eCol) ? (mCol > kCol && mCol < eCol) : (mCol < kCol && mCol > eCol);
-              return included && between;
-            });
-          } else {
-            // diagonal
-            const kCol = toNumber(king.col);
-            const eCol = toNumber(enemy.col);
-            soldier.moves = soldier.moves.filter(m => {
-              const included = enemy.moves.includes(m);
-              const mCol = toNumber(m[0]);
-              const yDiff = (kCol < eCol) ? (mCol > kCol && mCol < eCol) : (mCol < kCol && mCol > eCol);
-              const xDiff = (king.row < enemy.row) ? (m[1] < enemy.row && m[1] > king.row) : (m[1] > enemy.row && m[1] < king.row);
-              return included && xDiff & yDiff;
-            })
-          }
-          if (soldier.moves.length > 0) moveable.push(soldier);
+      let reduced = [];
+
+      // find if enemy can be captured
+      const breaker = soldier.moveset.find(s => s[0] == enemy.col && s[1] == enemy.row);
+      if (breaker) reduced = [breaker];
+
+      // if enemy moves in a line, find any moves 
+      if (enemy.type == 'rook' || enemy.type == 'bishop' || enemy.type == 'queen') {
+        if (enemy.col == king.col) {
+          // vertical
+          reduced = [...reduced, ...soldier.moveset.filter(m => {
+            const included = enemy.moveset.includes(m);
+            const between = (king.row < enemy.row) ? (m.row < enemy.row && m.row > king.row) : (m.row > enemy.row && m.row < king.row);
+            return included && between;
+          })];
+        } else if (enemy.row == king.row) {
+          // horizontal
+          const kCol = king.col;
+          const eCol = enemy.col;
+          reduced = [...reduced, ...soldier.moveset.filter(m => {
+            const included = enemy.moveset.includes(m);
+            const mCol = toNumber(m[0]);
+            const between = (kCol < eCol) ? (mCol > kCol && mCol < eCol) : (mCol < kCol && mCol > eCol);
+            return included && between;
+          })];
+        } else {
+          // diagonal
+          const kCol = king.col;
+          const eCol = enemy.col;
+          reduced = [...reduced, ...soldier.moveset.filter(m => {
+            const included = enemy.moveset.includes(m);
+            const mCol = toNumber(m[0]);
+            const yDiff = (kCol < eCol) ? (mCol > kCol && mCol < eCol) : (mCol < kCol && mCol > eCol);
+            const xDiff = (king.row < enemy.row) ? (m[1] < enemy.row && m[1] > king.row) : (m[1] > enemy.row && m[1] < king.row);
+            return included && xDiff & yDiff;
+          })];
         }
       }
-
-      // check if the king can escape
-      if (king.moves.length > 0) moveable.push(king);
-
-      // if no units can be moved, it's a checkmate!
-      if (moveable.length == 0) {
-        checkmate(oppColor);
-        break;
+      
+      // if moves exist after reducing, declare that piece can move
+      if (reduced.length > 0) {
+        soldier.moveset = reduced;
+        moveable.push(soldier);
       }
 
-      // if it reaches this point, the king is in check
-      document.getElementById(`${king.col}${king.row}`).classList.add('threatened');
-      check = true;
+    }
+
+    // check if the king can escape
+    if (king.moveset.length > 0) moveable.push(king);
+
+    // if no units can be moved, it's a checkmate!
+    if (moveable.length == 0) {
+      checkmate(oppColor);
       break;
     }
+
+    // if it reaches this point, the king is in check
+    document.getElementById(king.id).classList.add('threatened');
+    check = true;
+    break;
   }
 
   return check;
@@ -282,7 +301,7 @@ function determineCheck(side) {
 function promote(type) {
 
   // animation and promotion
-  const clone = new Piece(undefined, undefined, promoPawn.type, promoPawn.color);
+  const clone = {type: promoPawn.type, color: promoPawn.color};
   promoPawn.type = type;
   animatePromotion();
   logAction(clone, promoPawn, 'promote');

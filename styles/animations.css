@@ -87,6 +87,34 @@
   to { transform: scaleY(0); transform-origin: bottom; }
 }
 
+/* castling indication */
+.castling.left:hover::after { animation: rook-left 1s ease-in-out forwards }
+@keyframes rook-left {
+  from { transform: translateX(125%); opacity: 0; }
+  to { transform: translateX(-125%); opacity: 1; }
+}
+
+.castling.right:hover::after { animation: rook-right 1s ease-in-out forwards }
+@keyframes rook-right {
+  from { transform: translateX(-125%); opacity: 0; }
+  to { transform: translateX(125%); opacity: 1; }
+}
+
+/* en passant indication */
+.enpassant.up:hover::after { animation: swipe-up 500ms ease-in forwards }
+@keyframes swipe-up {
+  from { transform: translateY(-50%) rotateZ(-90deg); opacity: 0; }
+  30% { transform: translateY(-50%) rotateZ(-60deg); opacity: 1; }
+  to { transform: translateY(-50%) rotateZ(70deg); opacity: 1; }
+}
+
+.enpassant.down:hover::after { animation: swipe-down 500ms ease-in forwards }
+@keyframes swipe-down {
+  from { transform: scaleY(-1) translateY(-60%) rotateZ(-90deg); opacity: 0; }
+  30% { transform: scaleY(-1) translateY(-60%) rotateZ(-80deg); opacity: 1; }
+  to { transform: scaleY(-1) translate(20%, -60%) rotateZ(30deg); opacity: 1; }
+}
+
 
 
 /* 

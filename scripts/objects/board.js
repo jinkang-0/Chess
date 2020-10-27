@@ -1,7 +1,6 @@
 class Board {
 
   constructor() {
-    this.dom = document.querySelector('.board').children;
     this.pieces = [];
     this.turn;
   }
@@ -14,61 +13,71 @@ class Board {
   // check moves all pieces, then kings
   refreshMoveSet() {
     const kings = this.pieces.filter(p => p.type == 'king');
-    for (let piece of this.pieces) piece.checkMoves();
+    this.pieces.forEach(piece => {
+      if (piece.previous) piece.previous.time++;
+    });
+
+    for (let piece of this.pieces) {
+      piece.checkMoves();
+    }
+    
+    inCheck = determineCheck(this.turn);
     for (let king of kings) king.checkMoves();
   }
 
   initalize() {
-    this.turn = 'white';
-    this.constructDefault();
+    this.turn = 'black';
+    // this.constructDefault();
 
-    // this.pieces = [
-    //   new Piece(4, 'E', 'king', 'black'),
-    //   new Piece(5, 'C', 'king', 'white'),
-    //   new Piece(8, 'D', 'rook', 'white'),
-    //   new Piece(4, 'A', 'rook', 'black')
-    // ];
+    this.pieces = [
+      new Piece('B8', 'king', 'black'),
+      new Piece('E1', 'king', 'white'),
+      new Piece('E2', 'pawn', 'white'),
+      new Piece('D4', 'pawn', 'black'),
+      new Piece('F5', 'pawn', 'white'),
+      new Piece('E7', 'pawn', 'black')
+    ];
 
     this.refreshMoveSet();
   }
 
   constructDefault() {
     this.pieces = [
-      new Piece(8, 'A', 'rook'  , 'black'),
-      new Piece(8, 'B', 'knight', 'black'),
-      new Piece(8, 'C', 'bishop', 'black'),
-      new Piece(8, 'D', 'queen' , 'black'),
-      new Piece(8, 'E', 'king'  , 'black'),
-      new Piece(8, 'F', 'bishop', 'black'),
-      new Piece(8, 'G', 'knight', 'black'),
-      new Piece(8, 'H', 'rook'  , 'black'),
+      new Piece('A8', 'rook'  , 'black'),
+      new Piece('B8', 'knight', 'black'),
+      new Piece('C8', 'bishop', 'black'),
+      new Piece('D8', 'queen' , 'black'),
+      new Piece('E8', 'king'  , 'black'),
+      new Piece('F8', 'bishop', 'black'),
+      new Piece('G8', 'knight', 'black'),
+      new Piece('H8', 'rook'  , 'black'),
     
-      new Piece(7, 'A', 'pawn', 'black'),
-      new Piece(7, 'B', 'pawn', 'black'),
-      new Piece(7, 'C', 'pawn', 'black'),
-      new Piece(7, 'D', 'pawn', 'black'),
-      new Piece(7, 'E', 'pawn', 'black'),
-      new Piece(7, 'F', 'pawn', 'black'),
-      new Piece(7, 'G', 'pawn', 'black'),
-      new Piece(7, 'H', 'pawn', 'black'),
+      new Piece('A7', 'pawn', 'black'),
+      new Piece('B7', 'pawn', 'black'),
+      new Piece('C7', 'pawn', 'black'),
+      new Piece('D7', 'pawn', 'black'),
+      new Piece('E7', 'pawn', 'black'),
+      new Piece('F7', 'pawn', 'black'),
+      new Piece('G7', 'pawn', 'black'),
+      new Piece('H7', 'pawn', 'black'),
     
-      new Piece(2, 'A', 'pawn', 'white'),
-      new Piece(2, 'B', 'pawn', 'white'),
-      new Piece(2, 'C', 'pawn', 'white'),
-      new Piece(2, 'D', 'pawn', 'white'),
-      new Piece(2, 'E', 'pawn', 'white'),
-      new Piece(2, 'F', 'pawn', 'white'),
-      new Piece(2, 'G', 'pawn', 'white'),
-      new Piece(2, 'H', 'pawn', 'white'),
+      new Piece('A2', 'pawn', 'white'),
+      new Piece('B2', 'pawn', 'white'),
+      new Piece('C2', 'pawn', 'white'),
+      new Piece('D2', 'pawn', 'white'),
+      new Piece('E2', 'pawn', 'white'),
+      new Piece('F2', 'pawn', 'white'),
+      new Piece('G2', 'pawn', 'white'),
+      new Piece('H2', 'pawn', 'white'),
     
-      new Piece(1, 'A', 'rook'  , 'white'),
-      new Piece(1, 'B', 'knight', 'white'),
-      new Piece(1, 'C', 'bishop', 'white'),
-      new Piece(1, 'D', 'queen' , 'white'),
-      new Piece(1, 'E', 'king'  , 'white'),
-      new Piece(1, 'F', 'bishop', 'white'),
-      new Piece(1, 'G', 'knight', 'white'),
-      new Piece(1, 'H', 'rook'  , 'white')
+      new Piece('A1', 'rook'  , 'white'),
+      new Piece('B1', 'knight', 'white'),
+      new Piece('C1', 'bishop', 'white'),
+      new Piece('D1', 'queen' , 'white'),
+      new Piece('E1', 'king'  , 'white'),
+      new Piece('F1', 'bishop', 'white'),
+      new Piece('G1', 'knight', 'white'),
+      new Piece('H1', 'rook'  , 'white')
     ];
   }
 

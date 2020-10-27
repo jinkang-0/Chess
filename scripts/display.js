@@ -7,10 +7,27 @@
 
 // remove all highlighted grids
 function removeHighlights() {
+  
+  // remove highlighted grids
   const marked = document.querySelectorAll('.highlight');
-  for (let mark of marked) {
-    mark.classList.remove('highlight');
+  for (let mark of marked) mark.classList.remove('highlight');
+  
+  // remove special highlight grids
+  const specials = document.querySelectorAll('.special');
+  for (let sp of specials) {
+    if (sp.classList.contains('dark')) {
+      sp.className = 'dark';
+    } else if (sp.classList.contains('silver')) {
+      sp.className = 'silver';
+    }
   }
+
+  // remove selected grids
+  if (selectedCell) {
+    selectedCell.classList.remove('selected');
+    selectedCell = undefined;
+  }
+  
 }
 
 // creates a log
@@ -87,7 +104,7 @@ function showPromo(pawn) {
 function animatePromotion() {
 
   // play animation
-  const cell = document.getElementById(`${promoPawn.col}${promoPawn.row}`);
+  const cell = document.getElementById(promoPawn.id);
   cell.classList.add('promoting');
   setTimeout(() => {
     cell.classList.remove('promoting');
@@ -130,15 +147,21 @@ function checkmate(winners) {
   
   // update score
   setTimeout(() => {
-    winner.children.item(1).innerHTML = winScore;
+    if (winner.classList.contains('winner')) {
+      console.log('updated score');
+      winner.children.item(1).innerHTML = winScore;
+    }
   }, 2850);
 
   // show all scores
   setTimeout(() => {
-    const otherStat = stats.namedItem(`${other[0]}-stat`);
-    otherStat.classList.add('shown');
-    otherStat.children.item(1).innerHTML = otherScore;
-    document.getElementById('restart-button').className = 'shown';
+    if (winner.classList.contains('winner')) {
+      console.log('showed all scores');
+      const otherStat = stats.namedItem(`${other[0]}-stat`);
+      otherStat.classList.add('shown');
+      otherStat.children.item(1).innerHTML = otherScore;
+      document.getElementById('restart-button').className = 'shown';
+    }
   }, 3900);
 
 }

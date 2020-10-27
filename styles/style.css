@@ -78,10 +78,10 @@ body {
   background: var(--dark);
 }
 
-.highlight {
-  background: var(--highlight);
-  border: 1px solid var(--board);
-}
+.highlight, .special { border: 1px solid var(--board); }
+.highlight { background: var(--highlight); }
+.castling { background: royalblue; }
+.enpassant { background: darkorange; }
 
 .threatened::before, .danger::before {
   content: '';
@@ -114,6 +114,20 @@ body {
   background-color: royalblue;
   z-index: 100;
 }
+
+.castling::after, .enpassant::after {
+  content: '';
+  position: absolute;
+  opacity: 0;
+  width: 80%;
+  height: 80%;
+  z-index: 100;
+}
+
+.castling::after { clip-path: polygon(15% 10%, 30% 10%, 30% 25%, 40% 25%, 40% 10%, 60% 10%, 60% 25%, 70% 25%, 70% 10%, 85% 10%, 85% 40%, 65% 45%, 65% 80%, 85% 80%, 85% 95%, 15% 95%, 15% 80%, 35% 80%, 35% 45%, 15% 40%); }
+.enpassant::after { clip-path: polygon(50% 0%, 35% 15%, 42% 70%, 25% 70%, 25% 80%, 45% 80%, 45% 100%, 55% 100%, 55% 80%, 75% 80%, 75% 70%, 58% 70%, 65% 15%); }
+.special.white::after { background: white; }
+.special.black::after { background: black; }
 
 /* pieces */
 .white, .black {
