@@ -17,7 +17,33 @@ class Board {
       showDraw();
     } else {
       const nonkings = this.pieces.filter(p => p.type != 'king');
-      (nonkings.length == 0) ? stalemate() : hideDraw();
+
+      // if there are other units left (besides kings)
+      if (nonkings.length > 0) {
+        // it's a stale if there's only 1 bishop or 1 knight
+        if (nonkings.length == 1) {
+          if (nonkings[0].type == 'bishop' || nonkings[0].type == 'knight') {
+            stalemate();
+            return;
+          }
+        // also a stale if there's 2 opposing bishops on the same color
+        } else if (nonkings.length == 2) {
+          if (nonkings[0].type == 'bishop' && nonkings[1].type == 'bishop') {
+            const color0 = document.getElementById(nonkings[0].id).classList.item(0);
+            const color1 = document.getElementById(nonkings[1].id).classList.item(0);
+            if (color0 == color1) {
+              stalemate();
+              return;
+            }
+          }
+        }
+        
+        hideDraw();
+
+      // it's a stalemate if there's only 2 kings left
+      } else {
+        stalemate();
+      }
     }
 
     this.stales++;
@@ -36,9 +62,9 @@ class Board {
     }
     
     // determine potential check and refresh king moveset
-    inCheck = determineCheck(this.turn);
     const kings = this.pieces.filter(p => p.type == 'king');
     for (let king of kings) king.checkMoves();
+    inCheck = determineCheck(this.turn);
   }
 
   initalize() {
@@ -46,12 +72,12 @@ class Board {
     this.constructDefault();
 
     // this.pieces = [
-    //   new Piece('B8', 'king', 'black'),
+    //   new Piece('C7', 'king', 'black'),
     //   new Piece('E1', 'king', 'white'),
-    //   new Piece('E2', 'pawn', 'white'),
-    //   new Piece('D4', 'pawn', 'black'),
-    //   new Piece('F5', 'pawn', 'white'),
-    //   new Piece('E7', 'pawn', 'black')
+    //   new Piece('G6', 'queen', 'white'),
+    //   new Piece('C6', 'rook', 'black'),
+    //   new Piece('F6', 'bishop', 'black'),
+    //   new Piece('H2', 'pawn', 'white')
     // ];
 
     this.refreshMoveset();

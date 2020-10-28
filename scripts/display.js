@@ -173,8 +173,9 @@ function stalemate() {
   // hide stalemate option
   hideDraw();
 
-  // set end text
+  // set end text and box color
   document.getElementById('end-text').innerHTML = 'Stalemate!';
+  document.querySelector('.end-box').classList.add('stale');
 
   // start animation
   const screen = document.getElementById('end-screen');

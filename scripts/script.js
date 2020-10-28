@@ -106,10 +106,12 @@ function checkGrid(id) {
         const kingThreat = opp.threats.find(t => t.id == king.id && t.level == 2);
         const pieceThreat = opp.threats.find(t => t.id == piece.id && t.level == 0);
         // if it will, reduce its moves s.t. they won't cause the king to be in check
-        // if it has no safe moves, stop execution early
         if (kingThreat && pieceThreat) {
-          if ( !altCheck(piece, opp) ) return;
-          break;
+          altCheck(piece, opp);
+          // if it has no safe moves, stop execution early and indicate threat
+          if (piece.moveset.length == 0) {
+            return;
+          }
         }
       }
     }
@@ -136,45 +138,44 @@ function checkGrid(id) {
   }
 }
 
-// finds moves that won't put king in check
-// returns true if it can move, false otherwise
+// reduces pieces' moves such that they won't put king in check
 function altCheck(piece, opp) {
 
-  // knights cannot move in response to a threat
-  if (piece.type == 'knight') return false;
-
+  // get king position
   const king = board.pieces.find(p => p.type == 'king' && p.color == piece.color);
 
   // check horizontally, vertically, or diagonally
-  if (king.row == piece.row) { piece.moveset = piece.moveset.filter(m => m[1] == piece.id[1]); } 
-  else if (king.col == piece.col) { piece.moveset = piece.moveset.filter(m => m[0] == piece.id[0]); } 
+  if (king.row == piece.row && opp.row == piece.row) { piece.moveset = piece.moveset.filter(m => m[1] == piece.id[1]); } 
+  else if (king.col == piece.col && opp.col == piece.col) { piece.moveset = piece.moveset.filter(m => m[0] == piece.id[0]); } 
   else {
     // if it is not a straight diagonal, there is no danger
     const dy = king.row - piece.row;
     const dx = king.col - piece.col;
     const slope = Math.abs(dy / dx);
-    if (slope != 1) return true;
+    const dy2 = king.row - opp.row;
+    const dx2 = king.col - opp.col;
+    const slope2 = Math.abs(dy2 / dx2);
+    if (slope != 1 || slope2 != 1) return;
 
-    // rooks cannot respond to a diagonal threat
-    if (piece.type == 'rook') return false;
-
-    // finds safe moves for the piece (in between attack or attacker itself)
-    const pCol = piece.col;
-    const oCol = opp.col;
-    piece.moveset = piece.moveset.filter(m => {
-      if (m == opp.id) return true;
-      const included = opp.moveset.includes(m);
-      const mCol = toNumber(m[0]);
-      const vrDiff = (opp.row > piece.row) ? (m[1] < opp.row && m[1] > piece.row) : (m[1] > opp.row && m[1] < piece.row);
-      const hrDiff = (oCol < pCol) ? (mCol < pCol && mCol > oCol) : (mCol > pCol && mCol < oCol);
-      return included && hrDiff && vrDiff;
-    });
+    // knights and rooks cannot respond to a diagonal threat
+    if (piece.type == 'rook' || piece.type == 'knight') {
+      piece.moveset = [];
+    } else {
+      // finds diagonal safe moves between king and attacker
+      const pCol = piece.col;
+      const oCol = opp.col;
+      piece.moveset = piece.moveset.filter(m => {
+        if (m == opp.id) return true;
+        const included = opp.moveset.includes(m);
+        const mCol = toNumber(m[0]);
+        const vrDiff = (opp.row > piece.row) ? (m[1] < opp.row && m[1] > piece.row) : (m[1] > opp.row && m[1] < piece.row);
+        const hrDiff = (oCol < pCol) ? (mCol < pCol && mCol > oCol) : (mCol > pCol && mCol < oCol);
+        return included && hrDiff && vrDiff;
+      });
+    }
   }
 
-  // if the piece has no moves left, show it cannot move
-  if (piece.moveset.length > 0) {
-    return true;
-  } else {
+  if (piece.moveset.length == 0) {
     const grid = document.getElementById(opp.id);
     if (!grid.classList.contains('danger')) {
       grid.classList.add('danger');
@@ -182,8 +183,8 @@ function altCheck(piece, opp) {
         grid.classList.remove('danger');
       }, 1000);
     }
-    return;
   }
+
 }
 
 // updates possible moves after a piece moves
@@ -235,17 +236,18 @@ function determineCheck(side) {
       let reduced = [];
 
       // find if enemy can be captured
-      const breaker = soldier.moveset.find(s => s[0] == enemy.col && s[1] == enemy.row);
+      const breaker = soldier.moveset.find(s => s == enemy.id);
       if (breaker) reduced = [breaker];
 
-      // if enemy moves in a line, find any moves 
+      // if enemy moves in a line, find any moves that can block the attack
       if (enemy.type == 'rook' || enemy.type == 'bishop' || enemy.type == 'queen') {
         if (enemy.col == king.col) {
           // vertical
           reduced = [...reduced, ...soldier.moveset.filter(m => {
             const included = enemy.moveset.includes(m);
-            const between = (king.row < enemy.row) ? (m.row < enemy.row && m.row > king.row) : (m.row > enemy.row && m.row < king.row);
-            return included && between;
+            const between = (king.row < enemy.row) ? (m[1] < enemy.row && m[1] > king.row) : (m[1] > enemy.row && m[1] < king.row);
+            const constraint = (m[0] == king.id[0]);
+            return included && between && constraint;
           })];
         } else if (enemy.row == king.row) {
           // horizontal
@@ -255,7 +257,8 @@ function determineCheck(side) {
             const included = enemy.moveset.includes(m);
             const mCol = toNumber(m[0]);
             const between = (kCol < eCol) ? (mCol > kCol && mCol < eCol) : (mCol < kCol && mCol > eCol);
-            return included && between;
+            const constraint = (m[1] == king.row);
+            return included && between && constraint;
           })];
         } else {
           // diagonal
@@ -292,6 +295,16 @@ function determineCheck(side) {
     document.getElementById(king.id).classList.add('threatened');
     check = true;
     break;
+  }
+
+  // if no moves are possible, it's a checkmate!
+  const sameSide = [...sidePieces, king];
+  let allMoves = [];
+  for (let soldier of sameSide) {
+    allMoves = [...allMoves, ...soldier.moveset];
+  }
+  if (allMoves.length == 0) {
+    checkmate();
   }
 
   return check;
@@ -343,6 +356,7 @@ function restart() {
 
   // remove checkmate screen
   document.getElementById('end-screen').className = 'hidden';
+  document.querySelector('.end-box').classList.remove('stale');
   document.getElementById('w-stat').className = 'stats';
   document.getElementById('b-stat').className = 'stats';
   document.getElementById('restart-button').classList.remove('shown');

@@ -252,6 +252,7 @@ button:active { filter: brightness(0.9); }
   opacity: 1;
   transition: 200ms;
   transform-origin: bottom;
+  z-index: 100;
 }
 
 #stalemate-option.hidden { 
@@ -324,6 +325,9 @@ button:active { filter: brightness(0.9); }
   width: auto;
   filter: brightness(0.9);
   box-shadow: 2px 2px var(--dark);
+  background: var(--silver);
+  display: grid;
+  place-items: center;
 }
 
 .promotions div:hover {
@@ -371,9 +375,9 @@ button:active { filter: brightness(0.9); }
   align-items: center;
 }
 
-.end-box h1 {
-  font-size: 8rem;
-}
+.end-box.stale { background: #1f9e3f; }
+
+.end-box h1 { font-size: 8rem; }
 
 .stats {
   position: absolute;
@@ -429,6 +433,15 @@ button:active { filter: brightness(0.9); }
     min-height: 500px;
   }
 
+  .end-box h1 {
+    font-size: 6rem;
+    height: 8rem;
+  }
+
+  .end-box i, .end-box span {
+    font-size: 3.5rem;
+  }
+
 }
 
 @media (max-width: 102vh) {
@@ -440,6 +453,19 @@ button:active { filter: brightness(0.9); }
 
   .silver, .dark {
     font-size: 8vw;
+  }
+
+  .end-box h1 {
+    font-size: clamp(30px, 15vw, 6rem);
+    height: 7.4rem;
+  }
+
+  .end-box i, .end-box span {
+    font-size: clamp(30px, 10vw, 3rem);
+  }
+
+  #promo-box {
+    width: 90vw;
   }
 
 }

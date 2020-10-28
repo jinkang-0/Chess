@@ -175,7 +175,8 @@ function kingCheck(piece) {
   const oppSide = board.pieces.filter(p => p.color != piece.color);
 
   // check for castling if king has not moved and is not in check
-  if (piece.previous == undefined && !inCheck) {
+  const underAttack = board.pieces.find(p => p.color != piece.color && p.moveset.includes(piece.id));
+  if (piece.previous == undefined && !underAttack) {
     const rooks = board.pieces.filter(p => p.type == 'rook' && p.color == piece.color);
     const nonpawns = oppSide.filter(p => p.type != 'pawn');
     for (let rook of rooks) {
