@@ -75,7 +75,7 @@ class Board {
     //   new Piece('C7', 'king', 'black'),
     //   new Piece('E1', 'king', 'white'),
     //   new Piece('G6', 'queen', 'white'),
-    //   new Piece('C6', 'rook', 'black'),
+    //   new Piece('C6', 'queen', 'black'),
     //   new Piece('F6', 'bishop', 'black'),
     //   new Piece('H2', 'pawn', 'white')
     // ];

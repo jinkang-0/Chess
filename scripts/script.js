@@ -304,7 +304,7 @@ function determineCheck(side) {
     allMoves = [...allMoves, ...soldier.moveset];
   }
   if (allMoves.length == 0) {
-    checkmate();
+    checkmate(oppColor);
   }
 
   return check;
@@ -354,7 +354,7 @@ function restart() {
   inCheck = false;
   moveable = [];
 
-  // remove checkmate screen
+  // reset checkmate screen
   document.getElementById('end-screen').className = 'hidden';
   document.querySelector('.end-box').classList.remove('stale');
   document.getElementById('w-stat').className = 'stats';
@@ -366,5 +366,8 @@ function restart() {
   for (let piece of board.pieces) {
     piece.show();
   }
+
+  // reset turn icon
+  document.getElementById('turn-icon').className = `fas fa-chess-king ${board.turn}`;
 
 }
